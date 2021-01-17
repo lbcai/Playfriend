@@ -15,8 +15,24 @@ ttt_game_dictionary = {}
 
 class Dungeon(commands.Cog):
     """Docs here"""
-    print('placeholder')
 
+
+
+    class Mage:
+        def __init__(self):
+            self.armorType = cloth
+
+    class Priest:
+
+    class Warrior:
+
+    class Archer:
+
+    class Thief:
+
+    @commands.command(name='dsetup', help='Start a new Dungeon session.')
+    async def dungeon_setup(self, ctx):
+        bot.add_cog(Dungeon())
 
 class Tictactoe(commands.Cog):
     """Allows users to play tic tac toe. Use function ttt_start to create game instances.
@@ -44,7 +60,7 @@ class Tictactoe(commands.Cog):
         self.ttt_first_player = 0
 
     async def ttt_ai_move(self, ctx):
-        tt_list = ttt_game_dictionary[ctx.channel][0].tt_board_list
+        tt_list = self.tt_board_list
         rng_limiter = random.choice([5, 5, 5, 5, 6])
 
         def ttt_evaluate(tt_list):
@@ -97,11 +113,11 @@ class Tictactoe(commands.Cog):
                         tt_list[square] = 0
                 return not_best_score + depth
 
-        if ttt_game_dictionary[ctx.channel][0].tt_board_list.count(0) >= 8:
-            ttt_game_dictionary[ctx.channel][0].tt_board_list[random.choice(range(0, 9))] = 2
+        if self.tt_board_list.count(0) >= 8:
+            self.tt_board_list[random.choice(range(0, 9))] = 2
             return
 
-        tt_list_copy = ttt_game_dictionary[ctx.channel][0].tt_board_list * 1
+        tt_list_copy = self.tt_board_list * 1
         best_value = -11
         best_move = -1
         for square in range(0, 9):
@@ -125,17 +141,17 @@ class Tictactoe(commands.Cog):
                 if tt_list[i] == 0:
                     tt_symbol_list.append(tt_num_list[i])
                 elif tt_list[i] == 1:
-                    tt_symbol_list.append(ttt_game_dictionary[ctx.channel][0].tt_p1_symbol)
+                    tt_symbol_list.append(self.tt_p1_symbol)
                 else:
-                    tt_symbol_list.append(ttt_game_dictionary[ctx.channel][0].tt_p2_symbol)
+                    tt_symbol_list.append(self.tt_p2_symbol)
             return tt_symbol_list
 
-        tt_board = '{0}{1}{2} \n{3}{4}{5} \n{6}{7}{8}'.format(*ttt_replacer(ttt_game_dictionary[ctx.channel][0].tt_board_list))
+        tt_board = '{0}{1}{2} \n{3}{4}{5} \n{6}{7}{8}'.format(*ttt_replacer(self.tt_board_list))
         await ctx.channel.send(tt_board)
-        await Tictactoe.ttt_check_win(ttt_game_dictionary[ctx.channel][0], ctx)
+        await Tictactoe.ttt_check_win(self, ctx)
 
     async def ttt_check_win(self, ctx):
-        tt_list = ttt_game_dictionary[ctx.channel][0].tt_board_list
+        tt_list = self.tt_board_list
         for row in range(0, 3):
             offset = row * 3
             if tt_list[offset] == tt_list[offset + 1] and tt_list[offset + 1] == tt_list[offset + 2]:
@@ -225,7 +241,7 @@ class Tictactoe(commands.Cog):
                     elif ctx.message.author == ttt_game_dictionary[ctx.channel][2] and ttt_game_dictionary[ctx.channel][0].ttt_first_player == 2:
                         ttt_game_dictionary[ctx.channel][0].tt_board_list[int(message.strip()) - 1] = 2
                         ttt_game_dictionary[ctx.channel][0].ttt_first_player = 1
-                    await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel], ctx)
+                    await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
                 else:
                     await ctx.channel.send('That square is already marked.')
             else:
@@ -234,7 +250,7 @@ class Tictactoe(commands.Cog):
             if ttt_game_dictionary[ctx.channel][2] is f'{bot.user.name}' and 0 in ttt_game_dictionary[ctx.channel][0].tt_board_list and ttt_game_dictionary[ctx.channel][0].ttt_first_player == 2:
                 await Tictactoe.ttt_ai_move(ttt_game_dictionary[ctx.channel][0], ctx)
                 ttt_game_dictionary[ctx.channel][0].ttt_first_player = 1
-                await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel], ctx)
+                await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
 
 
 @bot.command(name='ttstart', help='Starts a game of tic tac toe.')
@@ -289,7 +305,7 @@ async def ttt_start(ctx):
                 ttt_game_dictionary[ctx.channel][0].ttt_first_player = 1
                 await ctx.channel.send(f'{ttt_game_dictionary[ctx.channel][1].mention} is going first.')
 
-            await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel], ctx)
+            await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
     else:
         await ctx.channel.send('There is already a tic tac toe game in this channel!')
     bot.add_cog(Tictactoe(ctx))
