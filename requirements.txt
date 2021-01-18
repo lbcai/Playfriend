@@ -2,3 +2,8 @@ async-timeout==3.0.1
 discord.py==1.5.1
 emojis==0.6.0
 python-dotenv==0.15.0
+Werkzeug==1.0.1
+Flask==1.1.2
+itsdangerous==1.1.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1

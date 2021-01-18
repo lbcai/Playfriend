@@ -17,18 +17,21 @@ class Dungeon(commands.Cog):
     """Docs here"""
 
 
+    #class Mage:
+    #    def __init__(self):
+    #        self.armorType = cloth
 
-    class Mage:
-        def __init__(self):
-            self.armorType = cloth
 
-    class Priest:
+    #class Priest:
 
-    class Warrior:
 
-    class Archer:
+    #class Warrior:
 
-    class Thief:
+
+    #class Archer:
+
+
+    #class Thief:
 
     @commands.command(name='dsetup', help='Start a new Dungeon session.')
     async def dungeon_setup(self, ctx):
