@@ -6,7 +6,8 @@
 </head>
 <body>
 <script>
-    window.location.replace("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
+try { window.location.replace("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot"); }
+catch(e) { window.location = "https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot"; }
 </script>
 </body>
 </html>
