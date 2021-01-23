@@ -295,7 +295,7 @@ async def ttt_start(ctx):
                 ttt_game_dictionary[ctx.channel][0] = Tictactoe(ctx)
             else:
                 ttt_game_dictionary[ctx.channel][0:3] = [Tictactoe(ctx), ttt_player_one, ttt_player_two]
-
+            await ctx.channel.send('Type >help to see a list of commands available for tic tac toe.')
             if random.choice([0, 1]) == 1:
                 ttt_game_dictionary[ctx.channel][0].ttt_first_player = 2
                 if ttt_game_dictionary[ctx.channel][2] is not f'{bot.user.name}':
@@ -439,6 +439,7 @@ async def hangman_start(message):
         await Hangman.hangman_output(hm_game_dictionary[message.channel], message)
     else:
         await message.channel.send('There is already a hangman game in this channel!')
+    await message.channel.send('Type >help to see a list of commands available for hangman.')
     bot.add_cog(Hangman())
 
 
