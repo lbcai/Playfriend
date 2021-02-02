@@ -2,6 +2,7 @@ import os
 import random
 import discord
 import emojis
+import re
 from discord.ext import commands
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
@@ -336,37 +337,49 @@ class Hangman(commands.Cog):
         self.used_word_list = []
         Hangman.hangman_guess_list(self)
 
+    # The list that will be used to display the current state of the guessed word is self.guess_list. _ for blanks,
+    # letters for correct guesses, and any non-letter characters will already be displayed. self.guess is for
+    # actually displaying the state to the user in the chat.
     def hangman_guess_list(self):
         self.guess_list = []
-        for i in range(0, len(self.word[0])):
-            self.guess_list.append('_')
+        for item in self.word[0]:
+            if item.isalpha():
+                self.guess_list.append('_')
+            else:
+                self.guess_list.append(item)
         Hangman.hangman_guess_filler(self)
+
 
     def hangman_guess_filler(self):
         self.guess = '```'
         for item in self.guess_list:
             self.guess += item
-            if item != ' ':
-                self.guess += ' '
+            if item != " ":
+                self.guess += " "
         self.guess += '```'
 
     @commands.command(name='hmword', help='Submit a custom word in spoiler tags, ex. ||word||. This will restart the game.')
-    async def hangman_custom(self, ctx, message):
-        await ctx.channel.send(f'A new game with {ctx.message.author.mention}\'s custom word is starting.')
+    async def hangman_custom(self, ctx, *, message):
         hangman_custom_word = ''
-        if '||' in message.strip():
-            for item in message.strip():
-                if item == '|':
-                    pass
-                else:
-                    hangman_custom_word += item
-            await ctx.message.delete()
-            if ctx.channel in hm_game_dictionary:
-                hm_game_dictionary[ctx.channel].hangman_image_counter = 0
-                hm_game_dictionary[ctx.channel].word = (hangman_custom_word, '...google it')
-                Hangman.hangman_guess_list(hm_game_dictionary[ctx.channel])
-            await Hangman.hangman_output(hm_game_dictionary[ctx.channel], ctx.message)
+        if re.search("[a-zA-Z]", message) is not None:
+            if '||' in message.strip():
+                for item in message.strip():
+                    if item == '|':
+                        pass
+                    else:
+                        hangman_custom_word += item
+                await ctx.message.delete()
+                if ctx.channel in hm_game_dictionary:
+                    hm_game_dictionary[ctx.channel].hangman_image_counter = 0
+                    hm_game_dictionary[ctx.channel].word = (hangman_custom_word, '...google it')
+                    Hangman.hangman_guess_list(hm_game_dictionary[ctx.channel])
+                await ctx.channel.send(f'A new game with {ctx.message.author.mention}\'s custom word is starting.')
+                await Hangman.hangman_output(hm_game_dictionary[ctx.channel], ctx.message)
+            else:
+                await ctx.channel.send("Put your word in spoiler tags next time.")
+                pass
         else:
+            await ctx.channel.send("There has to be at least one letter to guess in your word.")
             pass
 
     async def hangman_output(self, message):
@@ -436,10 +449,10 @@ class Hangman(commands.Cog):
 async def hangman_start(message):
     if message.channel not in hm_game_dictionary:
         hm_game_dictionary[message.channel] = Hangman()
+        await message.channel.send('Type >help to see a list of commands available for hangman.')
         await Hangman.hangman_output(hm_game_dictionary[message.channel], message)
     else:
         await message.channel.send('There is already a hangman game in this channel!')
-    await message.channel.send('Type >help to see a list of commands available for hangman.')
     bot.add_cog(Hangman())
 
 
