@@ -2,7 +2,7 @@
 Playfriend is a Discord bot coded in Python 3.9.0 with Discord.py and hosted on Heroku. The app site is handled using Flask and redirects to the bot invite link for convenience.
 
 ## Setup
-Click the invite link and invite the bot to your server. If a "playfriend" channel is set up, the bot will send a message there when it is ready to use. Use the >help command to get started.
+Click the invite link and invite the bot to your server. Use the >help command to see a list of currently available commands.
 
 ## Current Features
 *   :hourglass: Hangman: play a hangman game hosted by the bot with a word from 728 possible GRE vocabulary words. Users can also submit their own custom word for other players to guess.
@@ -10,7 +10,7 @@ Click the invite link and invite the bot to your server. If a "playfriend" chann
 <p align="center" width="100%">
   <img src="Images/playfriendhm.PNG?raw=true" alt="An example hangman game.">
 </p>
-<br>
+
 *   :x: Tic tac toe: play a tic tac toe game in 1 or 2-player variations. 1-player games are played against the bot AI while 2-player games can be played with other chat members. Users can pick any default emoji to use as their marker on the board. This emoji will be remembered between games.
 <br>
 <p align="center" width="100%">
