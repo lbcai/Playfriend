@@ -6,7 +6,16 @@ Click the invite link and invite the bot to your server. If a "playfriend" chann
 
 ## Current Features
 *   :hourglass: Hangman: play a hangman game hosted by the bot with a word from 728 possible GRE vocabulary words. Users can also submit their own custom word for other players to guess.
+<br>
+<p align="center" width="100%">
+  <img src="Images/playfriendhm.PNG?raw=true" alt="An example hangman game.">
+</p>
+<br>
 *   :x: Tic tac toe: play a tic tac toe game in 1 or 2-player variations. 1-player games are played against the bot AI while 2-player games can be played with other chat members. Users can pick any default emoji to use as their marker on the board. This emoji will be remembered between games.
+<br>
+<p align="center" width="100%">
+  <img src="Images/playfriendtt.PNG?raw=true" alt="An example tic tac toe board.">
+</p>
 
 ## Planned Features
 *   :game_die: Dungeon Crawler: play alone or with a party and travel through a randomly generated dungeon! Collect loot, upgrade your character, fight boss battles, and deal with a huge variety of random encounters. Sprites for maps, monsters, and items in the form of custom emojis make the game visually interesting. 
