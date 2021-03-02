@@ -1,2 +1,1 @@
-worker: python playfriend.py
-web: gunicorn app:app
+web: honcho -f ProcfileHoncho start

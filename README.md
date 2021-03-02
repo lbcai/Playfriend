@@ -19,6 +19,7 @@ Click the invite link and invite the bot to your server. Use the >help command t
 
 ## Planned Features
 *   :game_die: Dungeon Crawler: play alone or with a party and travel through a randomly generated dungeon! Collect loot, upgrade your character, fight boss battles, and deal with a huge variety of random encounters. Sprites for maps, monsters, and items in the form of custom emojis make the game visually interesting. 
+*   :bell: Standard Chat Features: including but not limited to a remindme function that will cause the bot to ping a user after the specified time or on the specified date.
 
 ## Links
 *   [Invite link](https://discord.com/api/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot)
