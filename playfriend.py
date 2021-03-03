@@ -34,9 +34,9 @@ class Dungeon(commands.Cog):
 
     #class Thief:
 
-    @commands.command(name='dsetup', help='Start a new Dungeon session.')
-    async def dungeon_setup(self, ctx):
-        bot.add_cog(Dungeon())
+    #@commands.command(name='dsetup', help='Start a new Dungeon session.')
+    #async def dungeon_setup(self, ctx):
+    #    bot.add_cog(Dungeon())
 
 class Tictactoe(commands.Cog):
     """Allows users to play tic tac toe. Use function ttt_start to create game instances.
@@ -245,7 +245,11 @@ class Tictactoe(commands.Cog):
                     elif ctx.message.author == ttt_game_dictionary[ctx.channel][2] and ttt_game_dictionary[ctx.channel][0].ttt_first_player == 2:
                         ttt_game_dictionary[ctx.channel][0].tt_board_list[int(message.strip()) - 1] = 2
                         ttt_game_dictionary[ctx.channel][0].ttt_first_player = 1
-                    await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
+                    # prevent unnecessary board in single player games.
+                    if ttt_game_dictionary[ctx.channel][2] is not f'{bot.user.name}':
+                        await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
+                    else:
+                        await Tictactoe.ttt_check_win(ttt_game_dictionary[ctx.channel][0], ctx)
                 else:
                     await ctx.channel.send('That square is already marked.')
             else:
