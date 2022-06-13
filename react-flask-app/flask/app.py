@@ -1,8 +1,16 @@
-from flask import Flask, redirect
+from flask import Flask, redirect, request
+from flask_mysqldb import MySQL
+import os
 import time
 
 app = Flask(__name__)
 
+app.config['MYSQL_HOST'] = os.getenv('CLEARDB_DATABASE_URL')
+app.config['MYSQL_USER'] = os.getenv('CLEARDB_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('CLEARDB_PASS')
+app.config['MYSQL_DB'] = os.getenv('CLEARDB_NAME')
+
+mysql = MySQL(app)
 
 @app.route('/')
 def index():
