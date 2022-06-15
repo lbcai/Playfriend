@@ -9,3 +9,12 @@ Jinja2==2.11.2
 MarkupSafe==1.1.1
 gunicorn==20.0.4
 honcho==1.0.1
+
+pip~=22.1
+wheel~=0.36.2
+click~=7.1.2
+ipython~=7.21.0
+setuptools~=54.1.2
+future~=0.18.2
+pymongo~=4.1.1
+discord~=1.0.1

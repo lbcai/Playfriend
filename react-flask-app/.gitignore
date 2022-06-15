@@ -25,3 +25,5 @@ yarn-error.log*
 /flask/venv
 /flask/__pycache__
 package.json
+/flask/.env
+/flask/.flaskenv
