@@ -5,6 +5,7 @@ import './App.css';
 function App() {
 
   const [currentTime, setCurrentTime] = useState(0);
+  let ticTacToe = fetch('/tttleader');
 
   useEffect(() => {
     fetch('/time').then(res => res.json()).then(data => {
