@@ -1,0 +1,53 @@
+ul {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+li {
+    display: inline;
+    padding: 1px;
+  }
+
+.active {
+    color: #eaeaeb;
+    background-color: #43464d;
+    text-decoration: none;
+    padding: 1%;
+    border-radius:5px 5px 0px 0px;
+	-webkit-border-radius:5px 5px 0px 0px;
+	-moz-border-radius:5px 5px 0px 0px;
+  }
+
+.active:hover {
+    background-color: #3c3f45;
+    color: #c8cacb;
+    text-decoration: none;
+    padding: 1%;
+    border-radius:5px 5px 0px 0px;
+	-webkit-border-radius:5px 5px 0px 0px;
+	-moz-border-radius:5px 5px 0px 0px;
+  }
+
+.inactive {
+    color: #94969b;
+    text-decoration: none;
+    padding: 1%;
+  }
+
+.inactive:hover {
+    background-color: #3c3f45;
+    color: #d8d9da;
+    text-decoration: none;
+    padding: 1%;
+    border-radius:5px 5px 0px 0px;
+	-webkit-border-radius:5px 5px 0px 0px;
+	-moz-border-radius:5px 5px 0px 0px;
+  }
+
+.navBackground {
+    background-color: #2f3136;
+    padding-top: 1%;
+    padding-bottom: 1%;
+  }

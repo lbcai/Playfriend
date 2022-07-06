@@ -9,8 +9,18 @@ function App() {
       <NavBar />
 
       <header className="App-header">
-        Hello test
+      Hello test
       </header>
+
+      <div>
+        <button>Get Playfriend</button>
+      </div>
+
+      <div>
+        <p>Text text here try now demo </p>
+        <button>Demo</button>
+      </div>
+
     </div>
   );
 }
