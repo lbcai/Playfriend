@@ -14,7 +14,7 @@ li {
     color: #eaeaeb;
     background-color: #43464d;
     text-decoration: none;
-    padding: 1%;
+    padding: 2%;
     border-radius:5px 5px 0px 0px;
 	-webkit-border-radius:5px 5px 0px 0px;
 	-moz-border-radius:5px 5px 0px 0px;
@@ -24,7 +24,7 @@ li {
     background-color: #3c3f45;
     color: #c8cacb;
     text-decoration: none;
-    padding: 1%;
+    padding: 2%;
     border-radius:5px 5px 0px 0px;
 	-webkit-border-radius:5px 5px 0px 0px;
 	-moz-border-radius:5px 5px 0px 0px;
@@ -33,14 +33,14 @@ li {
 .inactive {
     color: #94969b;
     text-decoration: none;
-    padding: 1%;
+    padding: 2%;
   }
 
 .inactive:hover {
     background-color: #3c3f45;
     color: #d8d9da;
     text-decoration: none;
-    padding: 1%;
+    padding: 2%;
     border-radius:5px 5px 0px 0px;
 	-webkit-border-radius:5px 5px 0px 0px;
 	-moz-border-radius:5px 5px 0px 0px;
@@ -48,6 +48,6 @@ li {
 
 .navBackground {
     background-color: #2f3136;
-    padding-top: 1%;
-    padding-bottom: 1%;
+    padding-top: 2%;
+    padding-bottom: 2%;
   }

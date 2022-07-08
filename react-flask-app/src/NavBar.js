@@ -10,7 +10,7 @@ function NavBar() {
                     className={({ isActive }) =>
                     isActive ? 'active' : 'inactive'
                     }
-                    exact="true" to="/">Home</NavLink>
+                    exact="true" to="/features">Features</NavLink>
             </li>
             <li>
                 <NavLink
