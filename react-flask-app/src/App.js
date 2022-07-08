@@ -1,7 +1,7 @@
 /* import { Route, Switch } from "react-router-dom"; */
 import NavBar from './NavBar';
 import './App.css';
-import icon from './images/02_01_21_playfriend_icon.png';
+import icon from './images/pf_icon_vector.svg';
 
 function App() {
   return (
@@ -16,12 +16,12 @@ function App() {
         <header className="App-header">
           A bot for chatroom minigames!
         </header>
-        <button>Get Playfriend</button>
+        <button> Invite to Server </button>
       </div>
 
       <div>
         <p>Text text here try now demo </p>
-        <button>Demo</button>
+        <button> Demo </button>
         <p>test</p>
         <p>test</p>
         <p>test</p>

@@ -1,23 +1,11 @@
-ul {
-    text-align: left;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-li {
-    display: inline;
-    padding: 1px;
-  }
-
 .active {
     color: #eaeaeb;
     background-color: #43464d;
     text-decoration: none;
     padding: 2%;
     border-radius:5px 5px 0px 0px;
-	-webkit-border-radius:5px 5px 0px 0px;
-	-moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -moz-border-radius:5px 5px 0px 0px;
   }
 
 .active:hover {
@@ -26,8 +14,8 @@ li {
     text-decoration: none;
     padding: 2%;
     border-radius:5px 5px 0px 0px;
-	-webkit-border-radius:5px 5px 0px 0px;
-	-moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -moz-border-radius:5px 5px 0px 0px;
   }
 
 .inactive {
@@ -42,12 +30,25 @@ li {
     text-decoration: none;
     padding: 2%;
     border-radius:5px 5px 0px 0px;
-	-webkit-border-radius:5px 5px 0px 0px;
-	-moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -moz-border-radius:5px 5px 0px 0px;
   }
 
 .navBackground {
     background-color: #2f3136;
-    padding-top: 2%;
-    padding-bottom: 2%;
+    display: flex;
+    align-items: center;
   }
+
+.navDiv {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 1% 2%;
+  white-space: nowrap;
+}
+
+.logo {
+  height: 8vmin;
+  margin-left: 7%;
+}
