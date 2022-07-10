@@ -1,54 +1,67 @@
-.active {
-    color: #eaeaeb;
-    background-color: #43464d;
-    text-decoration: none;
-    padding: 2%;
-    border-radius:5px 5px 0px 0px;
-    -webkit-border-radius:5px 5px 0px 0px;
-    -moz-border-radius:5px 5px 0px 0px;
-  }
+:root {
+  --back-color: #202225;
+  --dark-accent-color: #2f3136;
+  --mid-color: #36393f;
+  --font-color: #dcddde;
+  --button-color: #b9bbbe;
+  --active-nav-color: #43464d;
+  --active-nav-font-color: #eaeaeb;
+  --active-nav-hover-color: #3c3f45;
+  --active-nav-hover-font-color: #c8cacb;
+  --inactive-nav-font-color: #94969b;
+  --inactive-nav-hover-color: #3c3f45;
+  --inactive-nav-hover-font-color: #d8d9da;
+  --orange-highlight: #fe5309;
+  --light-orange-highlight: #fe9537;
+}
 
-.active:hover {
-    background-color: #3c3f45;
-    color: #c8cacb;
-    text-decoration: none;
-    padding: 2%;
-    border-radius:5px 5px 0px 0px;
-    -webkit-border-radius:5px 5px 0px 0px;
-    -moz-border-radius:5px 5px 0px 0px;
-  }
-
-.inactive {
-    color: #94969b;
-    text-decoration: none;
-    padding: 2%;
-  }
-
-.inactive:hover {
-    background-color: #3c3f45;
-    color: #d8d9da;
-    text-decoration: none;
-    padding: 2%;
-    border-radius:5px 5px 0px 0px;
-    -webkit-border-radius:5px 5px 0px 0px;
-    -moz-border-radius:5px 5px 0px 0px;
-  }
-
-.navBackground {
-    background-color: #2f3136;
-    display: flex;
-    align-items: center;
-  }
-
-.navDiv {
+.navBox {
+  text-decoration: none;
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 1% 2%;
+  padding: 1% 1.5%;
   white-space: nowrap;
+  margin: 0px 1px;
+  border-radius:10px;
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  overflow: hidden;
+  background-size: 100% 200%;
+  background-image: linear-gradient(to bottom, rgb(0, 0, 0, 0) 50%, var(--inactive-nav-hover-color) 50%);
+  -webkit-transition: background-position 0.2s;
+  -moz-transition: background-position 0.2s;
+  transition: background-position 0.2s;
 }
 
+.active {
+    color: var(--active-nav-font-color);
+    background-color: var(--active-nav-color);
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+
+.active:hover {
+    color: var(--dark-accent-color);
+    background-color: var(--light-orange-highlight);
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+
+.inactive {
+    color: var(--inactive-nav-font-color);
+  }
+
+.inactive:hover {
+    color: var(--inactive-nav-hover-font-color);
+    background-position: 0 100%;
+  }
+
+.navBackground {
+    display: flex;
+    align-items: center;
+    background-color: var(--back-color);
+  }
+
 .logo {
-  height: 8vmin;
-  margin-left: 7%;
+  height: 5vmin;
+  margin: 5px 1.5%;
 }

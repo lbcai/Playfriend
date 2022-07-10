@@ -1,77 +1,196 @@
 /* Site-wide styles */
 
+:root {
+  --back-color: #202225;
+  --dark-accent-color: #2f3136;
+  --top-color: #40444b;
+  --mid-color: #36393f;
+  --font-color: #dcddde;
+  --button-color: #b9bbbe;
+  --orange-highlight: #fe5309;
+  --light-orange-highlight: #fe9537;
+  --active-nav-font-color: #eaeaeb;
+}
+
 .App {
   text-align: center;
-  background-color: #36393f;
-  width: 75%;
+  background-color: var(--mid-color);
+  width: 70%;
   min-height: 100vh;
   margin: auto;
-  color: #dcddde;
+  color: var(--font-color);
   overflow: auto;
 }
 
 .App-logo {
-  height: 25vmin;
+  height: 30vmin;
   pointer-events: none;
   margin-bottom: 50px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.App-logo-text {
+  position: absolute;
+  height: 25vmin;
+  pointer-events: none;
+  margin-top: 140px;
 }
 
 .App-header {
+  font-size: calc(5px + 2vmin);
+  padding-bottom: 1%;
+}
+
+.App-header-div {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(5px + 2vmin);
-  padding-bottom: 20px;
+  padding-bottom: 8%;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.content {
+  background-color: var(--top-color);
+  border-radius: 1%;
+  -webkit-border-radius: 1%;
+  -moz-border-radius: 1%;
+  margin: 2% 8%;
+  padding: 2%;
 }
 
 .hero {
-  padding: 5%;
+  padding-top: 8%;
+  padding-bottom: 2.5%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+@keyframes mask {
+  10% {
+    opacity: 1;
+    -webkit-mask-size: 125%;
+    mask-size: 125%;
+  }
+
+  40% {
+    -webkit-mask-size: 175%;
+    mask-size: 175%;
+  }
+
+  70% {
+    -webkit-mask-size: 200%;
+    mask-size: 200%;
+  }
+
+  to {
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+.mask {
+  animation-name: mask;
+  --animate-duration: 400ms;
+  animation-delay: 1.6s;
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(circle, black 50%, rgba(0, 0, 0, 0) 50%);
+  mask-image: radial-gradient(circle, black 50%, rgba(0, 0, 0, 0) 50%);
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+}
+
+@keyframes textPop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 3000px, 0) scaleY(5);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translate3d(0, -150px, 0) scaleY(0.9);
+  }
+
+  65% {
+    transform: translate3d(0, -130px, 0) scaleY(0.93);
+  }
+
+  75% {
+    transform: translate3d(0, 0px, 0) scaleY(1);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.textPop {
+  animation-name: textPop;
+}
+
+@keyframes splat {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  10% {
+    transform: translate3d(0, 30px, 0) scaleY(0.9) scaleX(1.1);
+  }
+
+  40% {
+    transform: translate3d(0, -10px, 0) scaleY(1.01) scaleX(0.98);
+  }
+
+  60% {
+    transform: translate3d(0, 5px, 0);
+  }
+
+  80% {
+    transform: translate3d(0, 0px, 0) scaleY(1) scaleX(1);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.splat {
+  animation-name: splat;
+  animation-delay: 0.75s;
+}
+
 button {
   letter-spacing: 1px;
-  padding: 0.5rem 0.9rem;
+  padding: 0.8rem 1rem;
   font-size: calc(5px + 2vmin);
-  line-height: 2;
+  line-height: 1.75;
   border-radius: 1rem;
   border-style: none;
-  background-color: #b9bbbe;
-  color: #36393f;
+  background-color: var(--light-orange-highlight);
+  color: var(--dark-accent-color);
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
   text-align: center;
-
 }
 
 button:hover {
   cursor: pointer;
-  background-color: #dcddde;
+  background-color: var(--orange-highlight);
+  color: var(--dark-accent-color);
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 html, body, #root {
-  background-color: #292b2f;
+  background-color: var(--dark-accent-color);
   min-height: 100vh;
 }
