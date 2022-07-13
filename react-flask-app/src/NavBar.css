@@ -79,3 +79,7 @@
   height: 5vmin;
   margin: 5px 1.5%;
 }
+
+.logo:hover {
+  cursor: pointer;
+}

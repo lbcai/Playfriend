@@ -53,33 +53,71 @@
 }
 
 .content {
-  display: flex;
-  justify-content: left;
-  background-color: var(--top-color);
+  display: grid;
+  grid-template-columns: 47% 47%;
+  grid-row-gap: 6%;
+  grid-column-gap: 6%;
+  margin: 5% 10%;
+  padding: 0% 5% 5% 2%;
+}
+
+.content-single {
+  margin: 5% 10%;
+  padding: 0% 5% 1.5% 2%;
+}
+
+.content-div-left {
+  width: 90%;
+  margin: auto;
+  height: 90%;
+  padding: 5%;
+  background-color: var(--mid-color);
   border-radius: 10px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
-  margin: 2% 10% 5% 10%;
-  padding: 2%;
   box-shadow: 0px 1px 2px var(--back-color);
   -moz-box-shadow: 0px 1px 2px var(--back-color);
   -webkit-box-shadow: 0px 1px 2px var(--back-color);
 }
 
-.content-div-left {
-  display: block;
-  width: 44%;
-  padding: 2%;
-  margin: 1%;
+.content-image {
+  background-image: url("./images/playfriendtt.PNG");
+  background-position: 50% 50%;
+}
+
+.content-header {
+  grid-column: span 2;
+  width: 100%;
+  font-size: calc(6vmin);
+  font-weight: 600;
+}
+
+.content-header p {
+  margin-top: 5px;
+  font-size: calc(2vmin);
+  font-weight: 100;
+}
+
+.extra-header-margin {
+  margin-bottom: 3.5%;
 }
 
 .hero {
-  padding-top: 8%;
   padding-bottom: 2.5%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.hero-div {
+  height: 100vh;
+}
+
+.hero-div-center {
+  position: relative;
+  top: 50%;
+  transform:translateY(-50%);
 }
 
 @keyframes mask {
@@ -185,6 +223,7 @@
 }
 
 button {
+  margin: 0px;
   letter-spacing: 1px;
   padding: 0.8rem 1rem;
   font-size: calc(5px + 2vmin);
@@ -207,7 +246,23 @@ button:hover {
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
+button[disabled] {
+  background-color: var(--button-color);
+  color: var(--dark-accent-color);
+  cursor: auto;
+}
+
 html, body, #root {
   background-color: var(--dark-accent-color);
   min-height: 100vh;
+}
+
+hr {
+  box-shadow: 0px 1px 1px var(--back-color);
+  -moz-box-shadow: 0px 1px 1px var(--back-color);
+  -webkit-box-shadow: 0px 1px 1px var(--back-color);
+  border-top: 1px solid var(--back-color);
+  border-bottom: 0px;
+  border-left: 0px;
+  border-right: 0px;
 }
