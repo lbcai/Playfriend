@@ -17,6 +17,7 @@
   background-color: var(--dark-accent-color);
   width: 70%;
   min-height: 100vh;
+  min-width: 70vw;
   margin: auto;
   color: var(--font-color);
   overflow: hidden;
@@ -24,6 +25,7 @@
 
 .App-logo {
   height: 30vmin;
+  min-height: 240px;
   pointer-events: none;
   margin-bottom: 50px;
 }
@@ -31,12 +33,13 @@
 .App-logo-text {
   position: absolute;
   height: 25vmin;
+  min-height: 200px;
   pointer-events: none;
   margin-top: 140px;
 }
 
 .App-header {
-  font-size: calc(5px + 2vmin);
+  font-size: 1.6em;
   padding-bottom: 1%;
 }
 
@@ -54,7 +57,7 @@
 
 .content {
   display: grid;
-  grid-template-columns: 47% 47%;
+  grid-template-columns: minmax(300px, 47%) minmax(300px, 47%);
   grid-row-gap: 6%;
   grid-column-gap: 6%;
   margin: 5% 10%;
@@ -80,21 +83,46 @@
   -webkit-box-shadow: 0px 1px 2px var(--back-color);
 }
 
+.ul1 {
+  list-style-type: emoji1;
+}
+
+@counter-style emoji1 {
+  suffix: " ";
+  symbols: "❌" "👤" "📓";
+}
+
+.ul2 {
+  list-style-type: emoji2;
+}
+
+@counter-style emoji2 {
+  suffix: " ";
+  symbols: "📜" "🔔";
+}
+
+.left-align {
+  text-align: left;
+}
+
 .content-image {
   background-image: url("./images/playfriendtt.PNG");
+  background-repeat: no-repeat;
   background-position: 50% 50%;
+  min-height: auto;
+  min-width: auto;
 }
 
 .content-header {
   grid-column: span 2;
   width: 100%;
-  font-size: calc(6vmin);
+  font-size: 3em;
   font-weight: 600;
 }
 
 .content-header p {
   margin-top: 5px;
-  font-size: calc(2vmin);
+  font-size: 0.4em;
   font-weight: 100;
 }
 
@@ -118,6 +146,7 @@
   position: relative;
   top: 50%;
   transform:translateY(-50%);
+  min-width: 800px;
 }
 
 @keyframes mask {
@@ -237,6 +266,7 @@ button {
   box-shadow: 0px 2px 2px var(--back-color);
   -moz-box-shadow: 0px 2px 2px var(--back-color);
   -webkit-box-shadow: 0px 2px 2px var(--back-color);
+  font-size: 1.6em;
 }
 
 button:hover {
@@ -244,17 +274,20 @@ button:hover {
   background-color: var(--orange-highlight);
   color: var(--dark-accent-color);
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  font-size: 1.6em;
 }
 
 button[disabled] {
   background-color: var(--button-color);
   color: var(--dark-accent-color);
   cursor: auto;
+  font-size: 1.6em;
 }
 
 html, body, #root {
   background-color: var(--dark-accent-color);
   min-height: 100vh;
+  font-size: 100%;
 }
 
 hr {

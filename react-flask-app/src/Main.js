@@ -58,14 +58,55 @@ function Main() {
                     <p>Current and planned games, chat functions, and more.</p>
                 </div>
 
-                <div className='content-div-left'>
-                    <p>New minigames are currently in development and feature suggestions are welcome. Playfriend will also include random generators, helpful chat features, and more.</p>
+                <div className='content-div-left left-align'>
+                    <p>🎲 Current Features:</p>
+                    <ul className='ul1'>
+                        <li>Tic-Tac-Toe
+                            <ul>
+                                <li>Singleplayer against Minimax AI</li>
+                                <li>Multiplayer against another server member</li>
+                                <li>Customizable XO markers</li>
+                                <li>Difficulty settings for singleplayer mode</li>
+                            </ul>
+                        </li>
 
+                        <li>Hangman
+                            <ul>
+                                <li>Flexible player count (1+)</li>
+                                <li>Optional custom word/phrase submissions</li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            >help Command
+                            <ul>
+                                <li>Dynamic command display based on current game state</li>
+                            </ul>
+                        </li>
+
+                    </ul>
                 </div>
 
-                <div className='content-div-left'>
-                    <p>New minigames are currently in development and feature suggestions are welcome. Playfriend will also include random generators, helpful chat features, and more.</p>
+                <div className='content-div-left left-align'>
+                    <p>🔒 Upcoming Features:</p>
+                    <ul style={{paddingBottom: 20}} className='ul2'>
+                        <li>Dungeon Crawler (Working Title)
+                            <ul>
+                                <li>1-8 player procedurally generated dungeon exploration roleplaying game</li>
+                                <li>Variety of classes to choose from</li>
+                                <li>Variety of challenging puzzles, boss fights, and random encounters</li>
+                                <li>Upgrade your character with skill trees and items</li>
+                                <li>Sprites and custom graphics included</li>
+                            </ul>
+                        </li>
 
+                        <li>Standard Chat Features
+                            <ul>
+                                <li>RemindMe function</li>
+                                <li className='li-dice'>Random number generators</li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -78,7 +119,7 @@ function Main() {
                 </div>
 
                 <div className='content-div-left'>
-                    <p>New minigames are currently in development and feature suggestions are welcome. Playfriend will also include random generators, helpful chat features, and more.</p>
+                    <p>Coming soon!</p>
 
                 </div>
             </div>
@@ -92,7 +133,7 @@ function Main() {
                 </div>
 
                 <div className='content-div-left'>
-                    <p>New minigames are currently in development and feature suggestions are welcome. Playfriend will also include random generators, helpful chat features, and more.</p>
+                    <p>form</p>
 
                 </div>
             </div>
