@@ -1,0 +1,51 @@
+:root {
+    --back-color: #202225;
+    --dark-accent-color: #2f3136;
+    --top-color: #40444b;
+    --mid-color: #36393f;
+    --font-color: #dcddde;
+    --button-color: #b9bbbe;
+    --orange-highlight: #fe5309;
+    --light-orange-highlight: #fe9537;
+    --active-nav-font-color: #eaeaeb;
+  }
+
+input {
+    border-style: none;
+    background: transparent;
+    outline: none;
+}
+
+select {
+    background: transparent;
+    outline: none;
+    border-style: none;
+    padding: 10px;
+}
+
+textarea {
+    background: transparent;
+    outline: none;
+    border-style: none;
+}
+
+.input-email {
+    background: var(--top-color);
+    padding: 10px;
+    width: 50%;
+}
+
+.select-type {
+    background: var(--top-color);
+    color: var(--font-color);
+    width: 50%;
+    min-width: 200px;
+}
+
+.textarea-comment {
+    background: var(--top-color);
+    width: 50%;
+    height: 70%;
+    min-height: 200px;
+    min-width: 200px;
+}

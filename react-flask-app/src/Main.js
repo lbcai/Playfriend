@@ -1,6 +1,7 @@
 import logoCircle from './images/pf_icon_complete.svg';
 import textShort from './images/pf_text_short.svg';
 import textLong from './images/pf_text.svg';
+import ContactForm from './ContactForm';
 
 
 function Main() {
@@ -133,7 +134,8 @@ function Main() {
                 </div>
 
                 <div className='content-div-left'>
-                    <p>form</p>
+
+                <ContactForm />
 
                 </div>
             </div>
