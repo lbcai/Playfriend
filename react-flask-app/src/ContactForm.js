@@ -28,7 +28,7 @@ function ContactForm() {
             <div>
                 <label htmlFor='email'>Email: </label>
                 <br></br>
-                <input className='input-email' id='email' type='text' onChange={e => setEmail(e.target.value)} value={email} />
+                <input className='input-email' id='email' type='text' onChange={e => setEmail(e.target.value)} value={email} placeholder="Email Address"/>
             </div>
 
             <div>
@@ -41,7 +41,7 @@ function ContactForm() {
                     value={type}
                 >
                     <option value='' disabled>
-                    Select a type...
+                    Select a category...
                     </option>
                     <option>Bug Report</option>
                     <option>Suggestion</option>
@@ -56,6 +56,7 @@ function ContactForm() {
                     name='comments'
                     onChange={e => setComments(e.target.value)}
                     value={comments}
+                    placeholder="Comments"
                 />
             </div>
 

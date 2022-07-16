@@ -14,38 +14,92 @@ input {
     border-style: none;
     background: transparent;
     outline: none;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 select {
     background: transparent;
     outline: none;
     border-style: none;
-    padding: 10px;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 textarea {
     background: transparent;
     outline: none;
     border-style: none;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .input-email {
-    background: var(--top-color);
-    padding: 10px;
+    background: var(--dark-accent-color);
+    color: var(--font-color);
+    padding: 10px 0px;
     width: 50%;
+    min-width: 200px;
+    font-size: 1em;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.input-email[type="text"] {
+    box-sizing: border-box;
+    padding-left: 10px;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.input-email:hover {
+    background-color: var(--top-color);
+    transition: background-color 0.15s ease-in-out;
 }
 
 .select-type {
-    background: var(--top-color);
+    background: var(--dark-accent-color);
     color: var(--font-color);
     width: 50%;
     min-width: 200px;
+    padding: 10px 6px 10px 6px;
+    margin-bottom: 2px;
+    font-size: 1em;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.select-type:hover {
+    background-color: var(--top-color);
+    transition: background-color 0.15s ease-in-out;
 }
 
 .textarea-comment {
-    background: var(--top-color);
+    background: var(--dark-accent-color);
     width: 50%;
     height: 70%;
     min-height: 200px;
     min-width: 200px;
+    color: var(--font-color);
+    font-size: 1em;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 2%;
+    transition: background-color 0.15s ease-in-out;
+    resize: vertical;
+}
+
+.textarea-comment:hover {
+    transition: background-color 0.15s ease-in-out;
+    background: var(--top-color);
+}
+
+label {
+    padding: 0px;
+    font-size: 1em;
+    display: inline-block;
+    margin: 5px;
 }
