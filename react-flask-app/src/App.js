@@ -5,11 +5,9 @@ import 'animate.css';
 import Main from './Main';
 import Manual from './Manual';
 
-
 function App() {
   return (
     <div className="App">
-
       <NavBar />
 
       <Routes>

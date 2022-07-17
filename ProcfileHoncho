@@ -1,2 +1,2 @@
-web: gunicorn app:app --preload
+web: python app.py
 worker: python playfriend.py
