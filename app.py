@@ -52,4 +52,4 @@ def get_hm_games():
     return make_response(jsonify(hm_games))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=int(os.getenv('PORT')))
