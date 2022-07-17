@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request, jsonify, make_response
+from flask import Flask, redirect, request, jsonify, make_response, render_template
 from dotenv import load_dotenv
 import os
 
