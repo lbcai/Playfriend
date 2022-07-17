@@ -8,6 +8,7 @@
     --orange-highlight: #fe5309;
     --light-orange-highlight: #fe9537;
     --active-nav-font-color: #eaeaeb;
+    --inactive-nav-font-color: #94969b;
   }
 
 input {
@@ -41,7 +42,8 @@ textarea {
 }
 
 .input-email {
-    background: var(--dark-accent-color);
+    border: 1px solid var(--inactive-nav-font-color);
+    background: transparent;
     color: var(--font-color);
     padding: 10px 0px;
     width: 50%;
@@ -62,12 +64,13 @@ textarea {
 }
 
 .select-type {
-    background: var(--dark-accent-color);
+    border: 1px solid var(--inactive-nav-font-color);
+    background: var(--mid-color);
     color: var(--font-color);
     width: 50%;
     min-width: 200px;
     padding: 10px 6px 10px 6px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     font-size: 1em;
     transition: background-color 0.15s ease-in-out;
 }
@@ -78,7 +81,8 @@ textarea {
 }
 
 .textarea-comment {
-    background: var(--dark-accent-color);
+    border: 1px solid var(--inactive-nav-font-color);
+    background: transparent;
     width: 50%;
     height: 70%;
     min-height: 200px;
@@ -95,6 +99,12 @@ textarea {
 .textarea-comment:hover {
     transition: background-color 0.15s ease-in-out;
     background: var(--top-color);
+}
+
+.list-div {
+    text-align: left;
+    width: 50%;
+    margin: auto;
 }
 
 label {

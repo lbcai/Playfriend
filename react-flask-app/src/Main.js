@@ -2,6 +2,7 @@ import logoCircle from './images/pf_icon_complete.svg';
 import textShort from './images/pf_text_short.svg';
 import textLong from './images/pf_text.svg';
 import ContactForm from './ContactForm';
+import GameLog from './GameLog';
 
 
 function Main() {
@@ -121,7 +122,7 @@ function Main() {
 
                 <div className='content-div-left'>
                     <p>Coming soon!</p>
-
+                    <GameLog />
                 </div>
             </div>
 
