@@ -1,11 +1,11 @@
 async-timeout==3.0.1
-discord.py==1.5.1
+discord.py==1.7.3
 emojis==0.6.0
 python-dotenv==0.15.0
-Werkzeug==1.0.1
-Flask==1.1.2
-itsdangerous==1.1.0
-Jinja2==2.11.2
+Werkzeug==2.1.2
+Flask==2.1.3
+itsdangerous==2.1.2
+Jinja2==3.1.2
 MarkupSafe==1.1.1
 gunicorn==20.1.0
 honcho==1.1.0
@@ -13,9 +13,9 @@ dnspython==2.2.1
 
 pip~=22.1
 wheel~=0.36.2
-click~=7.1.2
+click~=8.1.3
 ipython~=7.21.0
 setuptools~=54.1.2
 future~=0.18.2
 pymongo~=4.1.1
-discord~=1.0.1
+discord~=1.7.3
