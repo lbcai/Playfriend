@@ -1,0 +1,115 @@
+:root {
+    --back-color: #202225;
+    --dark-accent-color: #2f3136;
+    --top-color: #40444b;
+    --mid-color: #36393f;
+    --font-color: #dcddde;
+    --button-color: #b9bbbe;
+    --orange-highlight: #fe5309;
+    --light-orange-highlight: #fe9537;
+    --active-nav-font-color: #eaeaeb;
+    --inactive-nav-font-color: #94969b;
+  }
+
+input {
+    border-style: none;
+    background: transparent;
+    outline: none;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+select {
+    background: transparent;
+    outline: none;
+    border-style: none;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+textarea {
+    background: transparent;
+    outline: none;
+    border-style: none;
+    padding: 0px;
+    margin: 0px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.input-email {
+    border: 1px solid var(--inactive-nav-font-color);
+    background: transparent;
+    color: var(--font-color);
+    padding: 10px 0px;
+    width: 50%;
+    min-width: 200px;
+    font-size: 1em;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.input-email[type="text"] {
+    box-sizing: border-box;
+    padding-left: 10px;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.input-email:hover {
+    background-color: var(--top-color);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.select-type {
+    border: 1px solid var(--inactive-nav-font-color);
+    background: var(--mid-color);
+    color: var(--font-color);
+    width: 50%;
+    min-width: 200px;
+    padding: 10px 6px 10px 6px;
+    margin-bottom: 4px;
+    font-size: 1em;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.select-type:hover {
+    background-color: var(--top-color);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.textarea-comment {
+    border: 1px solid var(--inactive-nav-font-color);
+    background: transparent;
+    width: 50%;
+    height: 70%;
+    min-height: 200px;
+    min-width: 200px;
+    color: var(--font-color);
+    font-size: 1em;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 2%;
+    transition: background-color 0.15s ease-in-out;
+    resize: vertical;
+}
+
+.textarea-comment:hover {
+    transition: background-color 0.15s ease-in-out;
+    background: var(--top-color);
+}
+
+.list-div {
+    text-align: left;
+    width: 50%;
+    margin: auto;
+}
+
+label {
+    padding: 0px;
+    font-size: 1em;
+    display: inline-block;
+    margin: 5px;
+}
