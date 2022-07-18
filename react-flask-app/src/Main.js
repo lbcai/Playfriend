@@ -3,7 +3,7 @@ import textShort from './images/pf_text_short.svg';
 import textLong from './images/pf_text.svg';
 import ContactForm from './ContactForm';
 import GameLog from './GameLog';
-
+import { scroller } from 'react-scroll';
 
 function Main() {
 
@@ -14,6 +14,14 @@ function Main() {
     const handleClick_demo = () => {
     window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
     };
+
+    const scrollToTop = () => {
+        scroller.scrollTo('navBackground', {
+            duration: 500,
+            delay: 0,
+            smooth: "easeInOutQuart",
+          });
+      }
 
     return (
         <div>
@@ -54,7 +62,7 @@ function Main() {
 
             <hr></hr>
 
-            <div className='content'>
+            <div className='content' id='features'>
                 <div className='content-header'>
                     Features
                     <p>Current and planned games, chat functions, and more.</p>
@@ -114,7 +122,7 @@ function Main() {
 
             <hr></hr>
 
-            <div className='content-single'>
+            <div className='content-single'  id='game-log'>
                 <div className='content-header extra-header-margin'>
                     Game Log
                     <p>Records and rankings for available minigames!</p>
@@ -128,7 +136,7 @@ function Main() {
 
             <hr></hr>
 
-            <div className='content-single'>
+            <div className='content-single' id='contact'>
                 <div className='content-header extra-header-margin'>
                     Contact
                     <p>Submit bug reports, feature suggestions, and feedback.</p>
