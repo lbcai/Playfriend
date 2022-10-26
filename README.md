@@ -2,7 +2,7 @@
   <img src="Images/pf_500w_logo.png?raw=true" alt="Playfriend graphical header.">
 </p>
 
-Playfriend is a Discord bot coded in Python 3.9.0 with Discord.py and hosted on Heroku. The app site is handled using Flask and redirects to the bot invite link. The site will be updated in the future to have a custom landing page.
+Playfriend is a Discord bot coded in Python 3.9.0 with Discord.py and hosted on Render (formerly hosted on Heroku). The site is currently in progress and uses Flask, React, and MongoDB.
 
 This bot was written by [lbcai](https://github.com/lbcai) as a Python & web hosting learning exercise. More features are planned.
 
@@ -30,4 +30,4 @@ Click the invite link and invite the bot to your server. Use the >help command t
 
 ## Links
 *   [Invite Link](https://discord.com/api/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot)
-*   [Website](https://playfriend.herokuapp.com/)
+*   [Website](https://playfriend.onrender.com/)
