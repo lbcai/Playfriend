@@ -4,8 +4,27 @@ import textLong from './images/pf_text.svg';
 import ContactForm from './ContactForm';
 import GameLog from './GameLog';
 import { scroller } from 'react-scroll';
+import { useEffect } from 'react';
 
 function Main() {
+
+    // set timer for 5 minutes to get information from uptime robot about status of bot
+    useEffect(() =>{
+        const uptimeRobotInterval = setInterval(() => {getStatus();}, 300000);
+        // always clean up intervals
+        return () => {clearInterval(uptimeRobotInterval);};
+    }, []);
+
+    const getStatus = () => {
+        try {
+            fetch('/status')
+            .then((response) => response.json())
+            .then((json) => {console.log(json);}
+            );
+        } catch (e) {
+            console.log('Uptime Robot getStatus Error - ', e);
+        }
+    };
 
     const handleClick_invite = () => {
         window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
