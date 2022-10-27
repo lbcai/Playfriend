@@ -37,7 +37,12 @@ function ContactForm() {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(information)
         })
-        .then((response) => response.json())
+        .then((response) =>
+            {if (response.status === 200) {
+                response.json();
+            } else {
+                return alert(`There was an error. Please try again later.`);
+            }})
         .then((json) => {
             if (json.result) {
                 setEmail('');

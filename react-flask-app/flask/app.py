@@ -7,15 +7,16 @@ import pymongo
 import json
 import time
 
+
 app = Flask(__name__, static_folder="build/static", template_folder="build")
 
 load_dotenv()
+UPTIME_ROBOT_API_KEY = os.getenv('UPTIME_ROBOT_API_KEY')
 MONGODB_URI = os.getenv('MONGODB_URI')
 # Connect to database
 client = pymongo.MongoClient(MONGODB_URI)
 mongo_db = client.db
 mongo_db.launches.drop()
-
 
 @app.route('/')
 def serve():
@@ -23,6 +24,7 @@ def serve():
 
 @app.route('/send', methods=['POST'])
 def new_submission():
+    print('test')
     submission = request.get_json()
     print(submission)
     result = mongo_db.submissions.insert_one(submission)
@@ -50,6 +52,19 @@ def get_hm_games():
         item.pop('_id', None)
 
     return make_response(jsonify(hm_games))
+
+@app.route('/status', methods=['POST'])
+def get_uptime_robot():
+    url = "https://api.uptimerobot.com/v2/getMonitors"
+
+    payload = f"api_key={UPTIME_ROBOT_API_KEY}&format=json&logs=1"
+    headers = {
+        'content-type': "application/x-www-form-urlencoded",
+        'cache-control': "no-cache"
+        }
+    response = requests.request("POST", url, data=payload, headers=headers)
+    print(response.text)
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT')))
