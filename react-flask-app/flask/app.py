@@ -53,7 +53,7 @@ def get_hm_games():
 
     return make_response(jsonify(hm_games))
 
-@app.route('/status', methods=['POST'])
+@app.route('/status', methods=['GET'])
 def get_uptime_robot():
     url = "https://api.uptimerobot.com/v2/getMonitors"
 
@@ -63,8 +63,7 @@ def get_uptime_robot():
         'cache-control': "no-cache"
         }
     response = requests.request("POST", url, data=payload, headers=headers)
-    print(response.text)
-    return response
+    return make_response(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT')))

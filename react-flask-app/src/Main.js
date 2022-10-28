@@ -4,13 +4,16 @@ import textLong from './images/pf_text.svg';
 import ContactForm from './ContactForm';
 import GameLog from './GameLog';
 import { scroller } from 'react-scroll';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 
 function Main() {
 
+    const [status, setStatus] = useState('');
+
     // set timer for 5 minutes to get information from uptime robot about status of bot
     useEffect(() =>{
-        const uptimeRobotInterval = setInterval(() => {getStatus();}, 300000);
+        const uptimeRobotInterval = setInterval(() => {getStatus(); console.log('status')}, 300000);
         // always clean up intervals
         return () => {clearInterval(uptimeRobotInterval);};
     }, []);
@@ -19,8 +22,9 @@ function Main() {
         try {
             fetch('/status')
             .then((response) => response.json())
-            .then((json) => {console.log(json);}
-            );
+            .then((json) => {
+                setStatus(json.stat);
+            });
         } catch (e) {
             console.log('Uptime Robot getStatus Error - ', e);
         }
@@ -55,6 +59,9 @@ function Main() {
                     <div className='App-header-div'>
                     <header className="App-header">
                         A bot for chatroom minigames!
+                        <div>
+                            Playfriend is currently {status}.
+                        </div>
                         </header>
                         <button onClick={handleClick_invite}> Invite to Server </button>
                     </div>
