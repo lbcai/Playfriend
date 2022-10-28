@@ -53,7 +53,7 @@ def get_hm_games():
 
     return make_response(jsonify(hm_games))
 
-@app.route('/status', methods=['GET'])
+@app.route('/status', methods=['POST'])
 def get_uptime_robot():
     url = "https://api.uptimerobot.com/v2/getMonitors"
 
