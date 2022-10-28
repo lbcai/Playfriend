@@ -24,16 +24,14 @@
 }
 
 .App-logo {
-  height: 30vmin;
-  min-height: 240px;
+  height: 240px;
   pointer-events: none;
   margin-bottom: 50px;
 }
 
 .App-logo-text {
   position: absolute;
-  height: 25vmin;
-  min-height: 200px;
+  height: 200px;
   pointer-events: none;
   margin-top: 140px;
 }
@@ -48,7 +46,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 8%;
 }
 
 .App-link {
@@ -140,14 +137,15 @@
 }
 
 .hero-div {
-  height: 100vh;
+  min-height: 600px;
+  max-height: 900px;
 }
 
 .hero-div-center {
-  position: relative;
-  top: 50%;
-  transform:translateY(-50%);
-  min-width: 800px;
+  width: 800px;
+  margin: auto;
+  padding-top: 10%;
+  padding-bottom: 10%;
 }
 
 @keyframes mask {
