@@ -1,1 +1,1 @@
-web: honcho -f ProcfileHoncho start
+web: python app.py -p $PORT
