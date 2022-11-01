@@ -13,16 +13,20 @@ function Main() {
 
     // set timer for 5 minutes to get information from uptime robot about status of bot
     useEffect(() =>{
-        const uptimeRobotInterval = setInterval(() => {getStatus(); console.log('status')}, 300000);
+        const uptimeRobotInterval = setInterval(() => {getStatus();}, 3000);
         // always clean up intervals
         return () => {clearInterval(uptimeRobotInterval);};
     }, []);
 
     const getStatus = () => {
         try {
-            fetch('/status')
-            .then((response) => response.json())
-            .then((json) => {
+            fetch('/status', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: ''
+            })
+            .then(response => response.json())
+            .then(json => {
                 setStatus(json.stat);
             });
         } catch (e) {

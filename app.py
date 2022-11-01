@@ -6,6 +6,7 @@ import dns
 import pymongo
 import json
 import time
+import requests
 
 
 app = Flask(__name__, static_folder="build/static", template_folder="build")
@@ -63,7 +64,8 @@ def get_uptime_robot():
         'cache-control': "no-cache"
         }
     response = requests.request("POST", url, data=payload, headers=headers)
-    return make_response(response)
+    print(response.text)
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT')))
