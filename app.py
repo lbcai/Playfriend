@@ -25,7 +25,6 @@ def serve():
 
 @app.route('/send', methods=['POST'])
 def new_submission():
-    print('test')
     submission = request.get_json()
     print(submission)
     result = mongo_db.submissions.insert_one(submission)
@@ -65,7 +64,7 @@ def get_uptime_robot():
         }
     response = requests.request("POST", url, data=payload, headers=headers)
     print(response.text)
-    return response
+    return "response"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT')))

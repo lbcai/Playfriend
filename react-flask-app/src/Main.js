@@ -64,7 +64,7 @@ function Main() {
                     <header className="App-header">
                         A bot for chatroom minigames!
                         <div>
-                            Playfriend is currently {status}.
+                            Playfriend is currently {status}up.
                         </div>
                         </header>
                         <button onClick={handleClick_invite}> Invite to Server </button>
