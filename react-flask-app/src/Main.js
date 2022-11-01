@@ -13,25 +13,27 @@ function Main() {
 
     // set timer for 5 minutes to get information from uptime robot about status of bot
     useEffect(() =>{
-        const uptimeRobotInterval = setInterval(() => {getStatus();}, 3000);
+        const uptimeRobotInterval = setInterval(() => {getStatus();}, 15000);
         // always clean up intervals
         return () => {clearInterval(uptimeRobotInterval);};
     }, []);
 
     const getStatus = () => {
-        try {
-            fetch('/status', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: ''
-            })
-            .then(response => response.json())
-            .then(json => {
-                setStatus(json.stat);
-            });
-        } catch (e) {
-            console.log('Uptime Robot getStatus Error - ', e);
-        }
+        fetch('/status', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: ''
+        })
+        .then(response => response.json())
+        .then(json => {
+            if (json.stat === "ok") {
+                setStatus("online");
+            } else {
+                setStatus("offline");
+            }
+
+        })
+        .catch(e => console.log('Uptime Robot getStatus Error - ', e));
     };
 
     const handleClick_invite = () => {
@@ -63,8 +65,8 @@ function Main() {
                     <div className='App-header-div'>
                     <header className="App-header">
                         A bot for chatroom minigames!
-                        <div>
-                            Playfriend is currently {status}up.
+                        <div className='status-text'>
+                            Playfriend is currently {status}.
                         </div>
                         </header>
                         <button onClick={handleClick_invite}> Invite to Server </button>

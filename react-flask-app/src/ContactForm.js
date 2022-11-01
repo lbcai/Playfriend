@@ -18,7 +18,7 @@ function ContactForm() {
         setValidationErrors(errors);
     }, [email, type, comments])
 
-    const onSubmit = e => {
+    const onSubmit = (e) => {
         e.preventDefault();
 
         setHasSubmitted(true);
@@ -37,12 +37,7 @@ function ContactForm() {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(information)
         })
-        .then((response) =>
-            {if (response.status === 200) {
-                response.json();
-            } else {
-                return alert(`There was an error. Please try again later.`);
-            }})
+        .then((response) => response.json())
         .then((json) => {
             if (json.result) {
                 setEmail('');
@@ -54,7 +49,8 @@ function ContactForm() {
             } else {
                 return alert(`There was an error. Please try again later.`);
             }
-        });
+        })
+        .catch((e) => {return alert(`There was an error. Please try again later.`)});
 
     }
 

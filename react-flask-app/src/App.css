@@ -46,6 +46,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-bottom: 2%;
 }
 
 .App-link {
@@ -146,6 +147,10 @@
   margin: auto;
   padding-top: 10%;
   padding-bottom: 10%;
+}
+
+.status-text {
+  font-size: 0.9em;
 }
 
 @keyframes mask {

@@ -24,9 +24,8 @@ def serve():
     return render_template('index.html')
 
 @app.route('/send', methods=['POST'])
-def new_submission():
+def send():
     submission = request.get_json()
-    print(submission)
     result = mongo_db.submissions.insert_one(submission)
     return make_response(jsonify(result=result.acknowledged))
 
@@ -63,8 +62,8 @@ def get_uptime_robot():
         'cache-control': "no-cache"
         }
     response = requests.request("POST", url, data=payload, headers=headers)
-    print(response.text)
-    return "response"
+    response = json.loads(response.text)
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT')))
