@@ -9,11 +9,11 @@ import { useEffect, useState } from 'react';
 
 function Main() {
 
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('online');
 
     // set timer for 5 minutes to get information from uptime robot about status of bot
     useEffect(() =>{
-        const uptimeRobotInterval = setInterval(() => {getStatus();}, 15000);
+        const uptimeRobotInterval = setInterval(() => {getStatus();}, 300000);
         // always clean up intervals
         return () => {clearInterval(uptimeRobotInterval);};
     }, []);
