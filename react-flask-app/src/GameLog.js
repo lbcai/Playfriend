@@ -1,17 +1,22 @@
 import { useTable } from 'react-table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 function GameLog () {
 
-    const getTtt = () => {
+    const [data, setData] = useState([{
+        'date': '',
+        'player1': '',
+        'player2': '',
+        'winner': ''
+    }]);
+
+    useMemo(() => {
         fetch('/tictactoe')
         .then((response) => response.json())
         .then((json) => {
-            console.log(json);
-            console.log('test');
-            return json;
+            setData(json);
         });
-    };
+    }, []);
 
     const getHm = () => {
         fetch('/hangman')
@@ -20,7 +25,7 @@ function GameLog () {
             console.log(json);
         });
     };
-    const data = useMemo(() => {console.log(getTtt()); return getTtt()}, []);
+
     const columnsTtt = useMemo(
         () => [
         {
