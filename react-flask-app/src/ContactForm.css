@@ -1,16 +1,3 @@
-:root {
-    --back-color: #202225;
-    --dark-accent-color: #2f3136;
-    --top-color: #40444b;
-    --mid-color: #36393f;
-    --font-color: #dcddde;
-    --button-color: #b9bbbe;
-    --orange-highlight: #fe5309;
-    --light-orange-highlight: #fe9537;
-    --active-nav-font-color: #eaeaeb;
-    --inactive-nav-font-color: #94969b;
-  }
-
 input {
     border-style: none;
     background: transparent;

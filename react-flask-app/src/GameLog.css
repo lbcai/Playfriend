@@ -1,0 +1,18 @@
+table {
+    background-color: var(--back-color);
+    border-radius: 5px;
+    margin: auto;
+    width: 90%;
+  }
+
+  th {
+    background-color: var(--back-color);
+  }
+
+  tr td:nth-child(odd) {
+    background-color: var(--dark-accent-color);
+  }
+
+  tr td:nth-child(even) {
+    background-color: var(--top-color);
+  }

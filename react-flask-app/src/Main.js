@@ -161,7 +161,6 @@ function Main() {
                 </div>
 
                 <div className='content-div-left'>
-                    <p>Coming soon!</p>
                     <GameLog />
                 </div>
             </div>

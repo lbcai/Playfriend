@@ -1,21 +1,30 @@
 import { useTable } from 'react-table';
 import { useMemo, useState } from 'react';
+import './GameLog.css';
 
 function GameLog () {
 
     const [data, setData] = useState([{
-        'date': '',
-        'player1': '',
-        'player2': '',
-        'winner': ''
+        'key': '',
+        '0': '',
+        '1': '',
+        '2': '',
     }]);
 
     useMemo(() => {
         fetch('/tictactoe')
         .then((response) => response.json())
         .then((json) => {
-            setData(json);
-        });
+            console.log('json', json);
+            let arrayOfObjects = Object.keys(json).map(key => {
+                let array = json[key];
+                array.key = key;
+                return array;
+             })
+            arrayOfObjects.sort((a, b) => b[0] - a[0]);
+            console.log('sorted', arrayOfObjects);
+            setData(arrayOfObjects);
+            });
     }, []);
 
     const getHm = () => {
@@ -29,20 +38,24 @@ function GameLog () {
     const columnsTtt = useMemo(
         () => [
         {
-            Header: 'Date',
-            accessor: 'date',
+            Header: 'Rank',
+            accessor: 'rank',
         },
         {
-            Header: 'Player 1',
-            accessor: 'player1', // accessor is the "key" in the data
+            Header: 'Player',
+            accessor: 'key',
         },
         {
-            Header: 'Player 2',
-            accessor: 'player2',
+            Header: 'Games Won',
+            accessor: '0', // accessor is the "key" in the data
         },
         {
-            Header: 'Winner',
-            accessor: 'winner',
+            Header: 'Games Lost',
+            accessor: '1',
+        },
+        {
+            Header: 'Games Tied',
+            accessor: '2',
         },
         ],
         []
