@@ -69,6 +69,12 @@ def get_ttt():
                     ttt[item['player1']][1] = ttt[item['player1']][1] + 1
                 else:
                     ttt[item['player1']] = [0, 1, 0]
+
+    ttt = {key: val for key, val in sorted(ttt.items(), key = lambda val: (-val[1][0], val[1][1]))}
+    num = 1
+    for item in ttt:
+        ttt[item].append(num)
+        num += 1
     return make_response(jsonify(ttt))
 
 @app.route('/hangman', methods=['GET'])

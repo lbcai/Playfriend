@@ -9,20 +9,18 @@ function GameLog () {
         '0': '',
         '1': '',
         '2': '',
+        '3': '',
     }]);
 
     useMemo(() => {
         fetch('/tictactoe')
         .then((response) => response.json())
         .then((json) => {
-            console.log('json', json);
             let arrayOfObjects = Object.keys(json).map(key => {
                 let array = json[key];
                 array.key = key;
                 return array;
-             })
-            arrayOfObjects.sort((a, b) => b[0] - a[0]);
-            console.log('sorted', arrayOfObjects);
+             }).sort((a, b) => a[3] - b[3]);
             setData(arrayOfObjects);
             });
     }, []);
@@ -39,7 +37,7 @@ function GameLog () {
         () => [
         {
             Header: 'Rank',
-            accessor: 'rank',
+            accessor: '3',
         },
         {
             Header: 'Player',
