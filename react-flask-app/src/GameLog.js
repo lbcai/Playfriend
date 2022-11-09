@@ -1,5 +1,6 @@
 import { useTable } from 'react-table';
 import { useMemo, useState } from 'react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import './GameLog.css';
 
 function GameLog () {
@@ -69,35 +70,48 @@ function GameLog () {
         } = tableInstance;
 
     return (
-        <table {...getTableProps()}>
+        <div className="game-log">
+        <Tabs>
+            <TabList>
+                <Tab>Tic-Tac-Toe</Tab>
+                <Tab>Hangman</Tab>
+            </TabList>
 
-        <thead>
-            {headerGroups.map(headerGroup => (                      // loop over header rows and apply header row props in tr
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (            // loop over headers in each row and apply header cell props
-                        <th {...column.getHeaderProps()}>
-                            {column.render('Header')}
-                        </th>))}
-                </tr>))}
-        </thead>
+            <TabPanel>
+                <table {...getTableProps()}>
+                    <thead>
+                        {headerGroups.map(headerGroup => (                      // loop over header rows and apply header row props in tr
+                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                {headerGroup.headers.map(column => (            // loop over headers in each row and apply header cell props
+                                    <th {...column.getHeaderProps()}>
+                                        {column.render('Header')}
+                                    </th>))}
+                            </tr>))}
+                    </thead>
 
-        <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
-            prepareRow(row)
-            return(
-                <tr {...row.getRowProps()}>
-                    {row.cells.map(cell=> {
+                    <tbody {...getTableBodyProps()}>
+                    {rows.map(row => {
+                        prepareRow(row)
                         return(
-                            <td {...cell.getCellProps()}>
-                                {cell.render('Cell')}
-                            </td>
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map(cell=> {
+                                    return(
+                                        <td {...cell.getCellProps()}>
+                                            {cell.render('Cell')}
+                                        </td>
+                                    )
+                                })}
+                            </tr>
                         )
                     })}
-                </tr>
-            )
-          })}
-        </tbody>
-      </table>
+                    </tbody>
+                </table>
+            </TabPanel>
+            <TabPanel>
+                Hello
+            </TabPanel>
+        </Tabs>
+        </div>
     );
 
 }

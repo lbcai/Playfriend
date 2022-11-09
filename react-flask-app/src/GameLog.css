@@ -2,7 +2,7 @@ table {
     background-color: var(--back-color);
     border-radius: 5px;
     margin: auto;
-    width: 90%;
+    width: 100%;
   }
 
   th {
@@ -15,4 +15,52 @@ table {
 
   tr td:nth-child(even) {
     background-color: var(--top-color);
+  }
+
+  .game-log {
+    background-color: var(--back-color);
+    border-radius: 10px;
+    width: 90%;
+    margin: auto;
+  }
+
+  .react-tabs {
+    padding: 1px;
+  }
+
+  .react-tabs__tab {
+    display: inline-block;
+    border-bottom: none;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin: 1px;
+    background: var(--dark-accent-color);
+    color: var(--font-color);
+    border-radius: 5px 5px 0 0;
+  }
+
+  .react-tabs__tab:focus {
+    outline: none;
+    background: var(--top-color);
+  }
+
+  .react-tabs__tab--selected {
+    background: var(--top-color);
+  }
+
+  .react-tabs__tab-panel--selected {
+    background: var(--top-color);
+    padding: 3%;
+    margin: 0% 3% 3% 3%;
+    border-radius: 0px 5px 5px 5px;
+  }
+
+  .react-tabs__tab-list {
+    text-align: left;
+    margin-bottom: 0px;
+    padding-left: 2.9%;
+    padding-top: 1%;
   }
