@@ -1,18 +1,10 @@
 :root {
-  --back-color: #202225;
-  --dark-accent-color: #2f3136;
-  --mid-color: #36393f;
-  --font-color: #dcddde;
-  --button-color: #b9bbbe;
   --active-nav-color: #43464d;
-  --active-nav-font-color: #eaeaeb;
   --active-nav-hover-color: #3c3f45;
   --active-nav-hover-font-color: #c8cacb;
   --inactive-nav-font-color: #94969b;
   --inactive-nav-hover-color: #3c3f45;
   --inactive-nav-hover-font-color: #d8d9da;
-  --orange-highlight: #fe5309;
-  --light-orange-highlight: #fe9537;
 }
 
 .navBox {

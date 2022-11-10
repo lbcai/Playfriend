@@ -108,7 +108,7 @@ function GameLog () {
                 </table>
             </TabPanel>
             <TabPanel>
-                Hello
+                Coming Soon!
             </TabPanel>
         </Tabs>
         </div>

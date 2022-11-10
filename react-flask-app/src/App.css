@@ -270,7 +270,8 @@ button {
   box-shadow: 0px 2px 2px var(--back-color);
   -moz-box-shadow: 0px 2px 2px var(--back-color);
   -webkit-box-shadow: 0px 2px 2px var(--back-color);
-  font-size: 1.6em;
+  font-size: 1.7em;
+  letter-spacing: 0px;
 }
 
 button:hover {
@@ -278,14 +279,12 @@ button:hover {
   background-color: var(--orange-highlight);
   color: var(--dark-accent-color);
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-  font-size: 1.6em;
 }
 
 button[disabled] {
   background-color: var(--button-color);
   color: var(--dark-accent-color);
   cursor: auto;
-  font-size: 1.6em;
 }
 
 html, body, #root {
