@@ -7,6 +7,7 @@ import pymongo
 import json
 import time
 import requests
+import sys
 
 
 app = Flask(__name__, static_folder="build/static", template_folder="build")
@@ -36,17 +37,50 @@ def get_ttt_winners():
     return make_response(jsonify(list(mongo_db.games.aggregate([{"$match" : {"game" : "Tic-Tac-Toe"}}, {"$group" : {"_id" : "$winner", "num_won" : {"$sum" : 1}}}]))))
 
 @app.route('/tictactoe', methods=['GET'])
-def get_ttt_games():
+def get_ttt():
     ttt_games = list(mongo_db.games.find({"game": "Tic-Tac-Toe"}))
-    # Remove pesky _id field which contains an object that can't be jsonified
+    ttt = {} # win lose tie array positions
     for item in ttt_games:
-        item.pop('_id', None)
+        if item['winner'] == "Tie!":
+            if item['player1'] in ttt:
+                ttt[item['player1']][2] = ttt[item['player1']][2] + 1
+            else:
+                ttt[item['player1']] = [0, 0, 1]
+            if item['player2'] in ttt:
+                ttt[item['player2']][2] = ttt[item['player2']][2] + 1
+            else:
+                ttt[item['player2']] = [0, 0, 1]
+        else:
+            if item['winner'] == item['player1']:
+                if item['player1'] in ttt:
+                    ttt[item['player1']][0] = ttt[item['player1']][0] + 1
+                else:
+                    ttt[item['player1']] = [1, 0, 0]
+                if item['player2'] in ttt:
+                    ttt[item['player2']][1] = ttt[item['player2']][1] + 1
+                else:
+                    ttt[item['player2']] = [0, 1, 0]
+            else:
+                if item['player2'] in ttt:
+                    ttt[item['player2']][0] = ttt[item['player2']][0] + 1
+                else:
+                    ttt[item['player2']] = [1, 0, 0]
+                if item['player1'] in ttt:
+                    ttt[item['player1']][1] = ttt[item['player1']][1] + 1
+                else:
+                    ttt[item['player1']] = [0, 1, 0]
 
-    return make_response(jsonify(ttt_games))
+    ttt = {key: val for key, val in sorted(ttt.items(), key = lambda val: (-val[1][0], val[1][1]))}
+    num = 1
+    for item in ttt:
+        ttt[item].append(num)
+        num += 1
+    return make_response(jsonify(ttt))
 
 @app.route('/hangman', methods=['GET'])
 def get_hm_games():
     hm_games = list(mongo_db.games.find({"game": "Hangman"}))
+    # Remove pesky _id field which contains an object that can't be jsonified
     for item in hm_games:
         item.pop('_id', None)
 
