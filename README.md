@@ -22,10 +22,12 @@ Click the invite link and invite the bot to your server. Use the >help command t
   <img src="Images/playfriendtt.PNG?raw=true" alt="An example tic-tac-toe board.">
 </p>
 
+*   :scroll: Custom Site: a polished site to showcase features, provide a user manual, and monitor bot uptime. There is also a form to accept feature suggestions and bug reports.
+
 ## Planned Features
 *   :game_die: Dungeon Crawler: play alone or with a party and travel through a randomly generated dungeon! Collect loot, upgrade your character, fight boss battles, and deal with a huge variety of random encounters. Sprites for maps, monsters, and items in the form of custom emojis make the game visually interesting. 
-*   :bell: Standard Chat Features: including but not limited to a remindme function that will cause the bot to ping a user after the specified time or on the specified date.
-*   :scroll: Custom Site: a polished site to showcase features and provide a user manual. There will also be a form to accept feature suggestions and bug reports.
+*   :bell: Standard Chat Features: including but not limited to a remindme function that will cause the bot to ping a user after the specified time or on the specified date, plus random number generators.
+
 
 
 ## Links
