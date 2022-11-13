@@ -15,9 +15,9 @@
 .App {
   text-align: center;
   background-color: var(--dark-accent-color);
-  width: 70%;
+  width: 70vw;
   min-height: 100vh;
-  min-width: 70vw;
+  min-width: 900px;
   margin: auto;
   color: var(--font-color);
   overflow: hidden;
@@ -38,7 +38,7 @@
 
 .App-header {
   font-size: 1.6em;
-  padding-bottom: 1%;
+  padding-bottom: 2%;
 }
 
 .App-header-div {
@@ -59,13 +59,22 @@
   grid-row-gap: 6%;
   grid-column-gap: 6%;
   margin: 5% 10%;
-  padding: 0% 5% 5% 2%;
+  padding: 5% 0% 5% 0%;
+}
+
+.content-triple {
+  display: grid;
+  grid-template-columns: minmax(150px, 30%) minmax(150px, 30%) minmax(150px, 30%);
+  grid-row-gap: 6%;
+  grid-column-gap: 6%;
+  margin: 5% 10%;
+  padding: 5% 0% 5% 0%;
 }
 
 .content-single {
   min-width: calc(600px + 6%);
   margin: 5% 10%;
-  padding: 0% 5% 1.5% 2%;
+  padding: 5% 0% 5% 0%;
 }
 
 .content-div-left {
@@ -80,6 +89,13 @@
   box-shadow: 0px 1px 2px var(--back-color);
   -moz-box-shadow: 0px 1px 2px var(--back-color);
   -webkit-box-shadow: 0px 1px 2px var(--back-color);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .ul1 {
@@ -105,11 +121,12 @@
 }
 
 .content-image {
+  background-size: cover;
   background-image: url("./images/playfriendtt.PNG");
   background-repeat: no-repeat;
   background-position: 50% 50%;
-  min-height: auto;
-  min-width: auto;
+  background-size: 150%;
+  min-width: 150px;
 }
 
 .content-header {
@@ -117,6 +134,10 @@
   width: 100%;
   font-size: 3em;
   font-weight: 600;
+}
+
+.content-header-3 {
+  grid-column: span 3;
 }
 
 .content-header p {
@@ -139,18 +160,14 @@
 
 .hero-div {
   min-height: 600px;
-  max-height: 900px;
+  height: 100vh;
 }
 
 .hero-div-center {
-  width: 800px;
+  max-width: 800px;
   margin: auto;
   padding-top: 10%;
   padding-bottom: 10%;
-}
-
-.status-text {
-  font-size: 0.9em;
 }
 
 @keyframes mask {
@@ -255,6 +272,37 @@
   --animate-duration: 0.6s;
 }
 
+#status-container {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#status-circle {
+  border-radius: 10px;
+  height: 10px;
+  width: 10px;
+  display: inline-block;
+  margin: 0px 5px 0px 5px;
+}
+
+#status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: var(--back-color);
+  border-radius: 10px;
+  width: 90%;
+  padding: 10px 0px;
+}
+
+#status h3 {
+  margin: 0px;
+}
+
 button {
   margin: 0px;
   letter-spacing: 1px;
@@ -285,6 +333,8 @@ button[disabled] {
   background-color: var(--button-color);
   color: var(--dark-accent-color);
   cursor: auto;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
 }
 
 html, body, #root {
@@ -301,4 +351,10 @@ hr {
   border-bottom: 0px;
   border-left: 0px;
   border-right: 0px;
+}
+
+@media (max-width: 1450px) {
+  button[disabled] {
+    font-size: 1.2rem;
+  }
 }

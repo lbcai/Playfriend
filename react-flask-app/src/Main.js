@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react';
 
 function Main() {
 
-    const [status, setStatus] = useState('online');
+    const [status, setStatus] = useState('Online');
+    const [percentUptime, setPercentUptime] = useState(99);
 
     // set timer for 5 minutes to get information from uptime robot about status of bot
     useEffect(() =>{
@@ -26,12 +27,13 @@ function Main() {
         })
         .then(response => response.json())
         .then(json => {
-            if (json.stat === "ok") {
-                setStatus("online");
+            console.log(json);
+            if (json.monitors[0].status < 3) {
+                setStatus("Online");
             } else {
-                setStatus("offline");
+                setStatus("Offline");
             }
-
+            setPercentUptime(json.monitors[0].custom_uptime_ratio);
         })
         .catch(e => console.log('Uptime Robot getStatus Error - ', e));
     };
@@ -65,9 +67,6 @@ function Main() {
                     <div className='App-header-div'>
                     <header className="App-header">
                         A bot for chatroom minigames!
-                        <div className='status-text'>
-                            Playfriend is currently {status}.
-                        </div>
                         </header>
                         <button onClick={handleClick_invite}> Invite to Server </button>
                     </div>
@@ -76,16 +75,32 @@ function Main() {
 
             <hr></hr>
 
-            <div className='content'>
-                <div className='content-header'>
+            <div className='content-triple'>
+                <div className='content-header content-header-3'>
                     Play minigames with friends!
                     <p>Playfriend is a developing chat bot that allows members of your server to play minigames together.</p>
                 </div>
+
+                <div className='content-div-left center'>
+                    <div id="status-container">
+                    <div id="status">
+                        <h3>Current Status:</h3>
+                        <div style={{color: status==='Online' ? '#32de84' : 'red'}}>
+                            <div id='status-circle' style={{backgroundColor: status==='Online' ? '#32de84' : 'red'}}></div>
+                            {status}
+                        </div>
+                    </div>
+                        <div id="status-7-days">
+                        <p>Playfriend has had <span style={{color: percentUptime > 70 ? '#32de84' : 'red'}}>{percentUptime}%</span> uptime in the last 7 days.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className='content-div-left'>
-                    <p>New minigames are currently in development and feature suggestions are welcome. Playfriend will also include random generators, helpful chat features, and more.</p>
+                    <p>New minigames are currently in development and feature suggestions are welcome. </p>
 
                     <p>Try out Playfriend with a demo!</p>
-                    <button disabled onClick={handleClick_demo}> Coming Soon </button>
+                    <button id="demo-button" disabled onClick={handleClick_demo}> Coming Soon </button>
                 </div>
 
                 <div className='content-div-left content-image'>

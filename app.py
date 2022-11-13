@@ -90,7 +90,7 @@ def get_hm_games():
 def get_uptime_robot():
     url = "https://api.uptimerobot.com/v2/getMonitors"
 
-    payload = f"api_key={UPTIME_ROBOT_API_KEY}&format=json&logs=1"
+    payload = f"api_key={UPTIME_ROBOT_API_KEY}&format=json&logs=1&custom_uptime_ratios=7"
     headers = {
         'content-type': "application/x-www-form-urlencoded",
         'cache-control': "no-cache"
