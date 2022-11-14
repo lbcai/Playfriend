@@ -13,7 +13,10 @@ function Main() {
     const [percentUptime, setPercentUptime] = useState(99);
 
     // set timer for 5 minutes to get information from uptime robot about status of bot
-    useEffect(() =>{
+    useEffect(() => {
+        if (percentUptime === 99) {
+            getStatus();
+        }
         const uptimeRobotInterval = setInterval(() => {getStatus();}, 300000);
         // always clean up intervals
         return () => {clearInterval(uptimeRobotInterval);};
@@ -68,7 +71,10 @@ function Main() {
                     <header className="App-header">
                         A bot for chatroom minigames!
                         </header>
-                        <button onClick={handleClick_invite}> Invite to Server </button>
+                        <button className="button-shine button-mod" onClick={handleClick_invite}> Invite to Server
+                        <div className="star star-1"></div>
+                        <div className="star star-2"></div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -175,7 +181,7 @@ function Main() {
                     <p>Records and rankings for available minigames!</p>
                 </div>
 
-                <div className='content-div-left'>
+                <div className='gamelog-modifier'>
                     <GameLog />
                 </div>
             </div>

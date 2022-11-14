@@ -20,7 +20,6 @@ table {
   .game-log {
     background-color: var(--back-color);
     border-radius: 10px;
-    width: 90%;
     margin: auto;
   }
 

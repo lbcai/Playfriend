@@ -9,6 +9,7 @@
   --button-color: #b9bbbe;
   --orange-highlight: #fe5309;
   --light-orange-highlight: #fe9537;
+  --yellow-shine: rgb(254, 221, 135);
   --active-nav-font-color: #eaeaeb;
 }
 
@@ -75,6 +76,12 @@
   min-width: calc(600px + 6%);
   margin: 5% 10%;
   padding: 5% 0% 5% 0%;
+}
+
+.gamelog-modifier {
+  min-width: calc(600px + 6%);
+  margin: 0;
+  padding: 0;
 }
 
 .content-div-left {
@@ -320,6 +327,42 @@ button {
   -webkit-box-shadow: 0px 2px 2px var(--back-color);
   font-size: 1.7em;
   letter-spacing: 0px;
+  position: relative;
+}
+
+.button-mod {
+  height: 75px;
+  width: 215px;
+}
+
+.button-shine {
+  animation-name: shine;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shine {
+  from, 10%, to {
+    background-image: transparent;
+  }
+  1.25% {
+    background-image: linear-gradient(130deg, var(--yellow-shine) 14%, transparent 14% 100%);
+  }
+  2.5% {
+    background-image: linear-gradient(130deg, transparent 16%, var(--yellow-shine) 16% 46%, transparent 46% 100%);
+  }
+  4.37% {
+    background-image: linear-gradient(130deg, transparent 59%, var(--yellow-shine) 59% 89%, transparent 89% 100%);
+  }
+  6.25% {
+    background-image: linear-gradient(130deg, transparent 72%, var(--yellow-shine) 72% 100%);
+  }
+  8.12% {
+    background-image: linear-gradient(130deg, transparent 90%, var(--yellow-shine) 90% 100%);
+  }
+  9.9% {
+    background-image: linear-gradient(130deg, transparent 98% var(--yellow-shine) 98% 100%);
+  }
 }
 
 button:hover {
@@ -335,6 +378,47 @@ button[disabled] {
   cursor: auto;
   font-size: 1.4rem;
   margin-bottom: 10px;
+}
+
+.star {
+  background-size: cover;
+  background-image: url("./images/sparkle-line.svg");
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 20%;
+  position: absolute;
+}
+
+.star-1 {
+  top: -91px;
+  left: 106px;
+  width: 200px;
+  height: 200px;
+  animation-name: pulse;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+}
+
+.star-2 {
+  top: -6px;
+  right: 134px;
+  width: 150px;
+  height: 150px;
+  animation-name: pulse;
+  animation-duration: 8s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.7);
+  }
+  50%, 60% {
+    transform: scale(1);
+  }
+  90%, 100% {
+    transform: scale(0.7);
+  }
 }
 
 html, body, #root {
