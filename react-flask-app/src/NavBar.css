@@ -26,13 +26,13 @@
   transition: background-position 0.2s;
 }
 
-.active {
+.isactive {
     color: var(--active-nav-font-color);
     background-color: var(--active-nav-color);
     transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
   }
 
-.active:hover {
+.isactive:hover {
     color: var(--dark-accent-color);
     background-color: var(--light-orange-highlight);
     transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
@@ -46,6 +46,10 @@
     color: var(--inactive-nav-hover-font-color);
     background-position: 0 100%;
   }
+
+.logo-link {
+  background: none;
+}
 
 .navBackground {
     position: static;
@@ -76,4 +80,18 @@
 
 .logo:hover {
   cursor: pointer;
+}
+
+@media (orientation: portrait) {
+  .navBox {
+    padding: 2.5% 2%;
+    margin: 0px 1px;
+    overflow: hidden;
+    background-size: 100% 200%;
+  }
+
+  .gitHubLink {
+    padding-top: 1.2%;
+    padding-bottom: 1.2%;
+  }
 }
