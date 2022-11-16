@@ -1,9 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import './NavBar.css';
 import icon from './images/pf_icon_vector.svg';
 import github from './images/GitHub-Mark.svg';
 import { scroller } from 'react-scroll';
-import { useLocation } from "react-router-dom";
 import { useEffect } from 'react';
 
 function NavBar() {
@@ -27,53 +26,20 @@ function NavBar() {
     });
   };
 
-
-  const scrollToFeatures = () => {
-    scroller.scrollTo('features', {
-      duration: 500,
-      delay: 0,
-      smooth: "easeInOutQuart",
-    });
-  };
-
-  const scrollToGameLog = () => {
-    scroller.scrollTo('game-log', {
-      duration: 500,
-      delay: 0,
-      smooth: "easeInOutQuart",
-    });
-  };
-
-  const scrollToContact = () => {
-    scroller.scrollTo('contact', {
-      duration: 500,
-      delay: 0,
-      smooth: "easeInOutQuart",
-    });
-  };
-
-  const scrollToTop = () => {
-    scroller.scrollTo('navBackground', {
-        duration: 500,
-        delay: 0,
-        smooth: "easeInOutQuart",
-      });
-  }
-
   return (
     <nav className='navBackground'>
 
-        <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo" onClick={ scrollToTop } /></NavLink>
+        <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo"/></NavLink>
 
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
-            exact="true" to="/features" onClick={ scrollToFeatures }>Features</NavLink>
+            exact="true" to="/features">Features</NavLink>
 
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
-            exact="true" to="/game-log" onClick={ scrollToGameLog }>Game Log</NavLink>
+            exact="true" to="/game-log">Game Log</NavLink>
 
         <NavLink
             className={({ isActive }) =>
@@ -83,7 +49,7 @@ function NavBar() {
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
-            exact="true" to="/contact" onClick={ scrollToContact }>Contact</NavLink>
+            exact="true" to="/contact">Contact</NavLink>
 
         <NavLink
             className={({ isActive }) =>
