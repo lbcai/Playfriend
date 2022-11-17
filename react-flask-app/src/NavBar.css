@@ -52,13 +52,16 @@
 }
 
 .navBackground {
-    position: static;
-    display: flex;
-    align-items: center;
-    background-color: var(--dark-accent-color);
-    box-shadow: 0px 1px 0px var(--back-color);
-    -moz-box-shadow: 0px 1px 0px var(--back-color);
-    -webkit-box-shadow: 0px 1px 0px var(--back-color);
+  position: fixed;
+  top: 0;
+  z-index: 2;
+  width: 70%;
+  display: flex;
+  align-items: center;
+  background-color: var(--dark-accent-color);
+  box-shadow: 0px 1px 0px var(--back-color);
+  -moz-box-shadow: 0px 1px 0px var(--back-color);
+  -webkit-box-shadow: 0px 1px 0px var(--back-color);
   }
 
 .gitHubLink {
@@ -118,6 +121,11 @@
 
 
 @media (orientation: portrait) {
+
+  .navBackground {
+    width: 100%;
+  }
+
   .navBox {
     padding: 2.5% 2%;
     margin: 0px 1px;

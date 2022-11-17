@@ -30,7 +30,6 @@ function Main() {
         })
         .then(response => response.json())
         .then(json => {
-            console.log(json);
             if (json.monitors[0].status < 3) {
                 setStatus("Online");
             } else {
@@ -48,14 +47,6 @@ function Main() {
     const handleClick_demo = () => {
     window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
     };
-
-    const scrollToTop = () => {
-        scroller.scrollTo('navBackground', {
-            duration: 500,
-            delay: 0,
-            smooth: "easeInOutQuart",
-          });
-      }
 
     return (
         <div>

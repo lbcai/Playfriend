@@ -12,7 +12,12 @@ function NavBar() {
   let location = useLocation();
 
   useEffect(() => {
-    scrollToX(location.pathname.slice(1));
+    if (location.pathname == '/') {
+      scrollToTop();
+    } else {
+      scrollToX(location.pathname.slice(1));
+    }
+
   }, [location]);
 
 
@@ -27,6 +32,14 @@ function NavBar() {
       smooth: "easeInOutQuart",
     });
   };
+
+  const scrollToTop = () => {
+    scroller.scrollTo('App', {
+        duration: 500,
+        delay: 0,
+        smooth: "easeInOutQuart",
+      });
+  }
 
   return (
     <nav className='navBackground'>
