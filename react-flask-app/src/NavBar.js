@@ -32,7 +32,7 @@ function NavBar() {
     <nav className='navBackground'>
 
         <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo"/></NavLink>
-      <div className={`hider ${dropdown ? "" : "dropdown"}`}>
+      <div className={`hider ${dropdown ? "dropdown" : ""}`}>
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
