@@ -3,9 +3,11 @@ import './NavBar.css';
 import icon from './images/pf_icon_vector.svg';
 import github from './images/GitHub-Mark.svg';
 import { scroller } from 'react-scroll';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function NavBar() {
+
+  const [dropdown, setDropdown] = useState(false);
 
   let location = useLocation();
 
@@ -30,7 +32,7 @@ function NavBar() {
     <nav className='navBackground'>
 
         <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo"/></NavLink>
-
+      <div className={`hider ${dropdown ? "" : "dropdown"}`}>
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
@@ -57,7 +59,12 @@ function NavBar() {
             exact="true" to="#" onClick={ handleClick_gitHub }>
               <img className='gitHubLogo' src={ github } alt="GitHub Logo" />
               GitHub</NavLink>
-
+      </div>
+        <button className="burger" onClick={() => setDropdown(!dropdown)}>
+          <div className="burger-bar bar-1"></div>
+          <div className="burger-bar bar-2"></div>
+          <div className="burger-bar bar-3"></div>
+        </button>
     </nav>
   );
 }

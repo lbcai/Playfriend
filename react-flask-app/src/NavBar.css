@@ -75,12 +75,47 @@
 
 .logo {
   height: 45px;
-  margin: 5px 1.5%;
+  margin: 5px 10px 5px 1.5%;
 }
 
 .logo:hover {
   cursor: pointer;
 }
+
+.burger {
+  display: none;
+}
+
+.burger-bar {
+  width: 80%;
+  height: 5px;
+  background-color: var(--inactive-nav-font-color);
+  transition: background-color 0.15s ease-in-out;
+  position: absolute;
+}
+
+.bar-1 {
+  left: 10%;
+  margin-top: -6px;
+}
+
+.bar-2 {
+  left: 10%;
+  margin-top: 7px;
+}
+
+.bar-3 {
+  left: 10%;
+  margin-top: 20px;
+}
+
+.hider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex-direction: row;
+}
+
 
 @media (orientation: portrait) {
   .navBox {
@@ -90,8 +125,67 @@
     background-size: 100% 200%;
   }
 
-  .gitHubLink {
+  .hider {
+    display: none;
+  }
+
+  .dropdown {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: var(--back-color);
+    position: absolute;
+    top: 60px;
+    right: 0px;
+    height: 300px;
+    width: 200px;
+    border-radius: 10px 0px 10px 10px;
+    z-index: 2;
+  }
+
+  .navBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  /* .gitHubLink {
     padding-top: 1.2%;
     padding-bottom: 1.2%;
+  } */
+
+  .burger {
+    margin-right: 20px;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    height: 45px;
+    width: 45px;
+    border-style: none;
+    background-color: transparent;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    border-radius: none;
+    position: relative;
   }
+
+  .burger:hover {
+    background-color: transparent;
+  }
+
+  .burger:hover .burger-bar {
+    background-color: var(--active-nav-font-color);
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .logo-link {
+    margin-left: 20px;
+  }
+
 }
