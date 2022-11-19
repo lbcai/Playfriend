@@ -120,6 +120,11 @@
   flex-direction: row;
 }
 
+.hider-mobile {
+  max-width: 0px;
+  width: 0px;
+  height: 0px;
+}
 
 @media (orientation: portrait) {
 
@@ -141,7 +146,7 @@
     height: 0px;
   }
 
-  .dropdown {
+  .hider-mobile {
     padding: 5px;
     display: flex;
     align-items: center;
@@ -159,25 +164,56 @@
     -moz-box-shadow: 10px 4px 10px var(--back-color);
     -webkit-box-shadow: 10px 4px 10px var(--back-color);
     max-width: 300px;
-    opacity: 1;
-    animation: popOut 0.3s;
+  }
+
+  .height-mod {
+    display: none;
+  }
+
+  .up-dropdown {
+    animation: popIn 0.15s ease-out forwards;
+  }
+
+  .dropdown {
+    animation: popOut 0.15s ease-out;
   }
 
   @keyframes popOut {
     from {
-      opacity: 1;
       transform: scaleY(0);
       transform-origin: top;
     }
 
-    90% {
-      transform: scaleY(1);
+    85% {
+      transform: scaleY(0.95);
       transform-origin: top;
     }
 
     to {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+  }
+
+  @keyframes popIn {
+    from {
       opacity: 1;
       transform: scaleY(1);
+      transform-origin: top;
+    }
+
+    95% {
+      transform: scaleY(0.05);
+      transform-origin: top;
+    }
+
+    99% {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+      transform: scaleY(0);
       transform-origin: top;
     }
   }

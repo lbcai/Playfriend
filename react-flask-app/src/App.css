@@ -442,6 +442,48 @@ hr {
   border-right: 0px;
 }
 
+.to-top {
+  z-index: 3;
+  height: 60px;
+  width: 60px;
+  border-radius: 20px;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 4px var(--back-color);
+  -moz-box-shadow: 0px 4px 4px var(--back-color);
+  -webkit-box-shadow: 0px 4px 4px var(--back-color);
+  bottom: 45px;
+  left: 84%;
+  font-size: 7rem;
+  background-color: var(--button-color);
+  transition: all 0.2s ease-in;
+  opacity: 1;
+}
+
+.to-top:hover {
+  bottom: 55px;
+  transition: all 0.2s ease-in;
+  background-color: var(--font-color);
+}
+
+.up {
+  margin-top: 55px;
+}
+
+.show-top {
+  bottom: -65px;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.show-top:hover {
+  bottom: -65px;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+}
+
 @media (orientation: portrait) {
   html, body {
     width: 100vw;

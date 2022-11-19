@@ -3,7 +3,6 @@ import textShort from './images/pf_text_short.svg';
 import textLong from './images/pf_text.svg';
 import ContactForm from './ContactForm';
 import GameLog from './GameLog';
-import { scroller } from 'react-scroll';
 import { useEffect, useState } from 'react';
 
 
@@ -45,8 +44,10 @@ function Main() {
       };
 
     const handleClick_demo = () => {
-    window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
+        window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
     };
+
+
 
     return (
         <div>
@@ -191,6 +192,8 @@ function Main() {
 
                 </div>
             </div>
+
+
 
         </div>
     );

@@ -8,6 +8,7 @@ import { useEffect, useState, useRef } from 'react';
 function NavBar() {
 
   const [dropdown, setDropdown] = useState(false);
+  const [firstOpen, setfirstOpen] = useState(true);
   const dropdownRef = useRef();
   const buttonRef = useRef();
 
@@ -33,7 +34,7 @@ function NavBar() {
     window.addEventListener("mousedown", clickOutside);
 
     return(() => {
-      document.removeEventListener("mousedown", clickOutside);
+      window.removeEventListener("mousedown", clickOutside);
     })
   }, []);
 
@@ -62,7 +63,7 @@ function NavBar() {
     <nav className='navBackground'>
 
         <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo"/></NavLink>
-      <div className={`hider ${dropdown ? "dropdown" : ""}`} ref={dropdownRef}>
+      <div className={`hider`}>
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
@@ -90,7 +91,39 @@ function NavBar() {
               <img className='gitHubLogo' src={ github } alt="GitHub Logo" />
               GitHub</NavLink>
       </div>
-        <button className="burger" onClick={() => setDropdown(!dropdown)} ref={buttonRef}>
+
+
+      <div className={`hider-mobile ${dropdown ? "dropdown" : "up-dropdown"} ${firstOpen ? "height-mod" : ""}`} ref={dropdownRef}>
+        <NavLink
+            className={({ isActive }) =>
+            isActive ? 'isactive navBox': 'inactive navBox'}
+            exact="true" to="/features">Features</NavLink>
+
+        <NavLink
+            className={({ isActive }) =>
+            isActive ? 'isactive navBox': 'inactive navBox'}
+            exact="true" to="/game-log">Game Log</NavLink>
+
+        <NavLink
+            className={({ isActive }) =>
+            isActive ? 'isactive navBox': 'inactive navBox'}
+            exact="true" to="/manual">Manual</NavLink>
+
+        <NavLink
+            className={({ isActive }) =>
+            isActive ? 'isactive navBox': 'inactive navBox'}
+            exact="true" to="/contact">Contact</NavLink>
+
+        <NavLink
+            className={({ isActive }) =>
+            isActive ? 'inactive navBox gitHubLink': 'inactive navBox gitHubLink'}
+            exact="true" to="#" onClick={ handleClick_gitHub }>
+              <img className='gitHubLogo' src={ github } alt="GitHub Logo" />
+              GitHub</NavLink>
+      </div>
+
+
+        <button className="burger" onClick={() => {setDropdown(!dropdown); setfirstOpen(false);}} ref={buttonRef}>
           <div className="burger-bar bar-1"></div>
           <div className="burger-bar bar-2"></div>
           <div className="burger-bar bar-3"></div>
