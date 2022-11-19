@@ -484,6 +484,10 @@ hr {
     min-height: 100px;
   }
 
+  .hero-div-center {
+    padding-top: 8%;
+  }
+
   .content-triple {
     display: flex;
     flex-direction: column;

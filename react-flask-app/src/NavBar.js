@@ -3,16 +3,19 @@ import './NavBar.css';
 import icon from './images/pf_icon_vector.svg';
 import github from './images/GitHub-Mark.svg';
 import { scroller } from 'react-scroll';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 function NavBar() {
 
   const [dropdown, setDropdown] = useState(false);
+  const dropdownRef = useRef();
+  const buttonRef = useRef();
 
   let location = useLocation();
 
+
   useEffect(() => {
-    if (location.pathname == '/') {
+    if (location.pathname === '/') {
       scrollToTop();
     } else {
       scrollToX(location.pathname.slice(1));
@@ -20,6 +23,19 @@ function NavBar() {
 
   }, [location]);
 
+  // monitor if click outside of dropdown in mobile mode
+  useEffect(() => {
+    const clickOutside = (e) => {
+      if (!dropdownRef.current.contains(e.target) && !buttonRef.current.contains(e.target)) {
+        setDropdown(false);
+      }
+    };
+    window.addEventListener("mousedown", clickOutside);
+
+    return(() => {
+      document.removeEventListener("mousedown", clickOutside);
+    })
+  }, []);
 
   const handleClick_gitHub = () => {
     window.open("https://github.com/lbcai/Playfriend");
@@ -27,6 +43,7 @@ function NavBar() {
 
   const scrollToX = (string) => {
     scroller.scrollTo(string, {
+      offset: -60,
       duration: 500,
       delay: 0,
       smooth: "easeInOutQuart",
@@ -45,7 +62,7 @@ function NavBar() {
     <nav className='navBackground'>
 
         <NavLink className="logo-link" to="/" exact="true"><img className='logo' src={ icon } alt="Playfriend Logo"/></NavLink>
-      <div className={`hider ${dropdown ? "dropdown" : ""}`}>
+      <div className={`hider ${dropdown ? "dropdown" : ""}`} ref={dropdownRef}>
         <NavLink
             className={({ isActive }) =>
             isActive ? 'isactive navBox': 'inactive navBox'}
@@ -73,7 +90,7 @@ function NavBar() {
               <img className='gitHubLogo' src={ github } alt="GitHub Logo" />
               GitHub</NavLink>
       </div>
-        <button className="burger" onClick={() => setDropdown(!dropdown)}>
+        <button className="burger" onClick={() => setDropdown(!dropdown)} ref={buttonRef}>
           <div className="burger-bar bar-1"></div>
           <div className="burger-bar bar-2"></div>
           <div className="burger-bar bar-3"></div>
