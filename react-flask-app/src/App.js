@@ -46,7 +46,7 @@ function App() {
           <Route path="*" element={<Main />} />
         </Routes>
       </div>
-      <button className={`to-top ${topVisible ? "" : "show-top"}`} onClick={() => scrollToTop()}><div className="up">ˆ</div></button>
+      <button className={`to-top ${topVisible ? "" : "show-top"}`} onClick={() => scrollToTop()}><div className="up"></div></button>
     </div>
   );
 }
