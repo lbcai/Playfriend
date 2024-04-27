@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: react
+    runtime: python
+    plan: free
+    buildCommand: "render-build.sh"
+    startCommand: "export PATH=\"${PATH}:/opt/render/project/.render/chrome/opt/google/chrome\"; honcho -f ProcfileHoncho start"
+    envVars:
+     - key: DISCORD_TOKEN
+     - key: MONGODB_URI
+     - key: PYTHON_VERSION
+     - key: UPTIME_ROBOT_API_KEY
