@@ -3,8 +3,8 @@ services:
     name: playfriend
     runtime: python
     plan: free
-    buildCommand: "bash ./render-build.sh"
-    startCommand: "export PATH=\"${PATH}:/opt/render/project/.render/chrome/opt/google/chrome\"; honcho -f ProcfileHoncho start"
+    buildCommand: "bash ./render-build.sh; export PATH=\"${PATH}:/opt/render/project/.render/chrome/opt/google/chrome\""
+    startCommand: "python app.py -p $PORT; python playfriend.py"
     envVars:
      - key: DISCORD_TOKEN
        sync: false
