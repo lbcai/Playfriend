@@ -7,6 +7,10 @@ services:
     startCommand: "export PATH=\"${PATH}:/opt/render/project/.render/chrome/opt/google/chrome\"; honcho -f ProcfileHoncho start"
     envVars:
      - key: DISCORD_TOKEN
+       sync: false
      - key: MONGODB_URI
+       sync: false
      - key: PYTHON_VERSION
+       sync: false
      - key: UPTIME_ROBOT_API_KEY
+       sync: false
