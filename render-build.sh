@@ -2,7 +2,7 @@
 # exit on error
 set -o errexit
 
-STORAGE_DIR=/opt/render/playfriend/.render
+STORAGE_DIR=/opt/render/Playfriend/.render
 
 if [[ ! -d $STORAGE_DIR/chrome ]]; then
   echo "...Downloading Chrome"
@@ -11,12 +11,12 @@ if [[ ! -d $STORAGE_DIR/chrome ]]; then
   wget -P ./ https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
   dpkg -x ./google-chrome-stable_current_amd64.deb $STORAGE_DIR/chrome
   rm ./google-chrome-stable_current_amd64.deb
-  cd $HOME/playfriend # Make sure we return to where we were
+  cd $HOME/Playfriend # Make sure we return to where we were
 else
   echo "...Using Chrome from cache"
 fi
 
 # be sure to add Chromes location to the PATH as part of your Start Command
-# export PATH="${PATH}:/opt/render/playfriend/.render/chrome/opt/google/chrome"
+# export PATH="${PATH}:/opt/render/Playfriend/.render/chrome/opt/google/chrome"
 
 # Thanks BigAlRender for this script.
