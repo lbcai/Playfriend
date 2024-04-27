@@ -586,10 +586,9 @@ grandma_times = [
     datetime.time(hour=5, minute=25)
 ]
 
-shard_times = []
-
 reset_time = datetime.time(hour=7, minute=1)
 reset_time_shard = datetime.time(hour=7, minute=0, second=10)
+shard_times = [reset_time_shard]
 
 
 @bot.command(name='skytrack', help='Starts Sky: Children of Light event tracking.')
