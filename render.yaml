@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: react
+    name: playfriend
     runtime: python
     plan: free
-    buildCommand: "render-build.sh"
+    buildCommand: "bash ./render-build.sh"
     startCommand: "export PATH=\"${PATH}:/opt/render/project/.render/chrome/opt/google/chrome\"; honcho -f ProcfileHoncho start"
     envVars:
      - key: DISCORD_TOKEN
@@ -11,6 +11,6 @@ services:
      - key: MONGODB_URI
        sync: false
      - key: PYTHON_VERSION
-       sync: false
+       value: 3.11.9
      - key: UPTIME_ROBOT_API_KEY
        sync: false
