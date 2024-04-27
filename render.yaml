@@ -3,14 +3,14 @@ services:
     name: playfriend
     runtime: python
     plan: free
-    buildCommand: "bash ./render-build.sh; export PATH=\"${PATH}:/opt/render/Playfriend/.render/chrome/opt/google/chrome\"; pip install -r ./requirements.txt"
-    startCommand: "honcho -f ProcfileHoncho start"
+    buildCommand: 'bash ./render-build.sh; pip install -r ./requirements.txt'
+    startCommand: 'export PATH="${PATH}:/opt/render/project/.render/chrome/opt/google/chrome"; honcho -f ProcfileHoncho start'
     envVars:
      - key: DISCORD_TOKEN
        sync: false
      - key: MONGODB_URI
        sync: false
      - key: PYTHON_VERSION
-       value: 3.11.9
+       sync: false
      - key: UPTIME_ROBOT_API_KEY
        sync: false
