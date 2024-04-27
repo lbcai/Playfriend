@@ -1,22 +1,35 @@
 import os
 import random
-from datetime import date
+import datetime
 
 import discord
 import emojis
 import re
 
-import dns
 import pymongo
-from discord.ext import commands
+from discord import Intents
+from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 
+from urllib.request import urlopen, Request
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-bot = Bot(command_prefix='>')
+intents = Intents.default()
+intents.message_content = True
+bot = Bot(command_prefix='>', intents=intents)
 hm_game_dictionary = {}
 ttt_game_dictionary = {}
+settings = {
+    'sky': {
+        'grandma': True,
+        'geyser': True,
+        'sky': False,
+        'channel': None
+    }
+}
+guild = None
 
 MONGODB_URI = os.getenv('MONGODB_URI')
 # Connect to database
@@ -42,7 +55,7 @@ class Dungeon(commands.Cog):
 
     # @commands.command(name='dsetup', help='Start a new Dungeon session.')
     # async def dungeon_setup(self, ctx):
-    #    bot.add_cog(Dungeon())
+    #    bot.add_cog(Dungeon(), guild=ctx.guild)
 
 
 class Tictactoe(commands.Cog):
@@ -75,7 +88,7 @@ class Tictactoe(commands.Cog):
                 2].discriminator
         else:
             player_2 = f'{bot.user.name}'
-        today_date = date.today()
+        today_date = datetime.date.today()
         self.game_doc = {'player1': ttt_game_dictionary[ctx.channel][1].name +
                                     "#" + ttt_game_dictionary[ctx.channel][1].discriminator,
                          'player2': player_2, 'game': 'Tic-Tac-Toe',
@@ -240,7 +253,7 @@ class Tictactoe(commands.Cog):
 
         def ttt_get_emoji(emoji_response):
             return ctx.channel == emoji_response.channel and ctx.message.author == emoji_response.author and \
-                   emojis.count(emoji_response.content) > 0
+                emojis.count(emoji_response.content) > 0
 
         if ctx.message.author in ttt_game_dictionary[ctx.channel][1:3]:
             if message.strip().lower() == 'bot' and ttt_game_dictionary[ctx.channel][2] is f'{bot.user.name}':
@@ -268,7 +281,7 @@ class Tictactoe(commands.Cog):
     async def ttt_quit(self, ctx):
         ttt_game_dictionary[ctx.channel][0] = None
         await ctx.channel.send('The tic tac toe game has ended.')
-        bot.remove_cog('Tictactoe')
+        await bot.remove_cog('Tictactoe', guild=ctx.guild)
 
     @commands.command(name='tt', help="To mark a square, type >tt # according to the grid.")
     async def ttt_mark_square(self, ctx, message):
@@ -276,8 +289,8 @@ class Tictactoe(commands.Cog):
                 ttt_game_dictionary[ctx.channel][2]:
             if int(message.strip()) in range(1, 10):
                 if ttt_game_dictionary[ctx.channel][0].tt_board_list[int(message.strip()) - 1] == 0:
-                    if ctx.message.author == ttt_game_dictionary[ctx.channel][1] and ttt_game_dictionary[ctx.channel][
-                        0].ttt_first_player == 1:
+                    if (ctx.message.author == ttt_game_dictionary[ctx.channel][1] and
+                            ttt_game_dictionary[ctx.channel][0].ttt_first_player == 1):
                         ttt_game_dictionary[ctx.channel][0].tt_board_list[int(message.strip()) - 1] = 1
                         ttt_game_dictionary[ctx.channel][0].ttt_first_player = 2
                     elif ctx.message.author == ttt_game_dictionary[ctx.channel][2] and ttt_game_dictionary[ctx.channel][
@@ -294,8 +307,9 @@ class Tictactoe(commands.Cog):
             else:
                 await ctx.channel.send('Send a number between 1 and 9 to mark a square!')
         if ttt_game_dictionary[ctx.channel][0] is not None:
-            if ttt_game_dictionary[ctx.channel][2] is f'{bot.user.name}' and 0 in ttt_game_dictionary[ctx.channel][
-                0].tt_board_list and ttt_game_dictionary[ctx.channel][0].ttt_first_player == 2:
+            if (ttt_game_dictionary[ctx.channel][2] is f'{bot.user.name}' and 0 in
+                    ttt_game_dictionary[ctx.channel][0].tt_board_list and
+                    ttt_game_dictionary[ctx.channel][0].ttt_first_player == 2):
                 await Tictactoe.ttt_ai_move(ttt_game_dictionary[ctx.channel][0], ctx)
                 ttt_game_dictionary[ctx.channel][0].ttt_first_player = 1
                 await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
@@ -306,11 +320,11 @@ async def ttt_start(ctx):
     def ttt_get_players(num_response):
         # Check to make sure the game starter is answering the question.
         return ctx.message.author == num_response.author and ctx.channel == num_response.channel and \
-               num_response.content.lower().strip() in ['1', '2', 'one', 'two', '1p', '2p', '>tt 1', '>tt 2']
+            num_response.content.lower().strip() in ['1', '2', 'one', 'two', '1p', '2p', '>tt 1', '>tt 2']
 
     def ttt_get_second_player(me_response):
         return ctx.channel == me_response.channel and ttt_player_one != me_response.author and \
-               me_response.content.lower().strip() in ['me', 'i']
+            me_response.content.lower().strip() in ['me', 'i']
 
     if ctx.channel not in ttt_game_dictionary or ttt_game_dictionary[ctx.channel][0] is None:
         ttt_players = 0
@@ -355,7 +369,7 @@ async def ttt_start(ctx):
             await Tictactoe.ttt_output(ttt_game_dictionary[ctx.channel][0], ctx)
     else:
         await ctx.channel.send('There is already a tic tac toe game in this channel!')
-    bot.add_cog(Tictactoe(ctx))
+    await bot.add_cog(Tictactoe(ctx), guild=ctx.guild)
 
 
 class Hangman(commands.Cog):
@@ -380,7 +394,7 @@ class Hangman(commands.Cog):
         self.used_word_list = []
         Hangman.hangman_guess_list(self)
 
-        today_date = date.today()
+        today_date = datetime.date.today()
         self.game_doc = {'Server': ctx.guild.name,
                          'game': 'Hangman',
                          'guesses': 0, 'date': '%s/%s/%s' % (today_date.month,
@@ -439,7 +453,7 @@ class Hangman(commands.Cog):
 
     async def hangman_wrong(self, ctx):
         hm_game_dictionary[ctx.channel].hangman_image_counter += 1
-        self.game_doc['guesses'] = f'{hm_game_dictionary[ctx.channel].hangman_image_counter}'
+        self.game_doc['guesses'] = hm_game_dictionary[ctx.channel].hangman_image_counter
         await Hangman.hangman_output(hm_game_dictionary[ctx.channel], ctx.message)
         if hm_game_dictionary[ctx.channel].hangman_image_counter == 6:
             bot_message = f'Your man is hung. RIP. The word was {hm_game_dictionary[ctx.channel].word[0].lower()}, ' \
@@ -447,8 +461,8 @@ class Hangman(commands.Cog):
             await ctx.channel.send(bot_message)
             self.game_doc['status'] = 'Hung'
             self.game_doc['lastplayer'] = ctx.message.author.name + "#" + ctx.message.author.discriminator
-            hm_game_dictionary.pop(ctx.channel, None)
-            return mongo_db.games.insert_one(self.game_doc)
+            mongo_db.games.insert_one(self.game_doc)
+            await self.hangman_quit_helper(ctx)
 
     async def hangman_win(self, ctx):
         bot_message = f'Congratulations! You won. The word was {hm_game_dictionary[ctx.channel].word[0].lower()}, ' \
@@ -456,8 +470,8 @@ class Hangman(commands.Cog):
         await ctx.channel.send(bot_message)
         self.game_doc['status'] = 'Survived'
         self.game_doc['lastplayer'] = ctx.message.author.name + "#" + ctx.message.author.discriminator
-        hm_game_dictionary.pop(ctx.channel, None)
-        return mongo_db.games.insert_one(self.game_doc)
+        mongo_db.games.insert_one(self.game_doc)
+        await self.hangman_quit_helper(ctx)
 
     @commands.command(name='hm',
                       help='Make a guess. Use single letters unless you are confident you know the entire word!')
@@ -465,8 +479,8 @@ class Hangman(commands.Cog):
         if message.strip().isalpha() is False:
             await ctx.channel.send('Use a letter.')
         else:
-            if len(message.strip()) == 1 and message.strip().lower() not in hm_game_dictionary[
-                ctx.channel].used_word_list:
+            if (len(message.strip()) == 1 and message.strip().lower() not in
+                    hm_game_dictionary[ctx.channel].used_word_list):
                 hm_game_dictionary[ctx.channel].used_word_list.append(message.strip().lower())
                 hm_letter_counter = 0
                 for letter in range(0, len(hm_game_dictionary[ctx.channel].word[0])):
@@ -498,12 +512,15 @@ class Hangman(commands.Cog):
 
     @commands.command(name='hmquit', help='Quit the current hangman game.')
     async def hangman_quit(self, ctx):
+        await self.hangman_quit_helper(ctx)
+
+    async def hangman_quit_helper(self, ctx):
         if ctx.channel in hm_game_dictionary:
             hm_game_dictionary.pop(ctx.channel, None)
             await ctx.channel.send('The hangman game has ended.')
         else:
             await ctx.channel.send('There is currently no hangman game in this channel.')
-        bot.remove_cog('Hangman')
+        await bot.remove_cog('Hangman', guild=ctx.guild)
 
 
 @bot.command(name='hmstart', help='Starts a game of hangman.')
@@ -514,24 +531,192 @@ async def hangman_start(ctx):
         await Hangman.hangman_output(hm_game_dictionary[ctx.channel], ctx.message)
     else:
         await ctx.channel.send('There is already a hangman game in this channel!')
-    bot.add_cog(Hangman(ctx))
+    await bot.add_cog(Hangman(ctx), guild=ctx.guild)
 
 
 @bot.event
 async def on_ready():
+    global settings
+    global guild
     ready_message = f'{bot.user.name} just woke up! Type ">help" for a basic command list.'
     channel = discord.utils.get(bot.get_all_channels(), name='playfriend')
+    guild = channel.guild
+    old_settings = mongo_db.settings.find_one({"guild": guild.id})
+    if old_settings:
+        settings = old_settings['settings']
+    else:
+        mongo_db.settings.insert_one({"guild": guild.id, "settings": settings})
+    if settings['sky']['sky']:
+        channel = bot.get_channel(settings['sky']['channel'])
+        await bot.add_cog(SkyTracker(bot, channel), guild=channel.guild)
     await channel.send(ready_message)
 
 
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-    if message.content == 'hi':
-        await message.channel.send('<:rip:280861016911380480>')
+geyser_times = [
+    datetime.time(hour=6, minute=55),
+    datetime.time(hour=8, minute=55),
+    datetime.time(hour=10, minute=55),
+    datetime.time(hour=12, minute=55),
+    datetime.time(hour=14, minute=55),
+    datetime.time(hour=16, minute=55),
+    datetime.time(hour=18, minute=55),
+    datetime.time(hour=20, minute=55),
+    datetime.time(hour=22, minute=55),
+    datetime.time(hour=0, minute=55),
+    datetime.time(hour=2, minute=55),
+    datetime.time(hour=4, minute=55)
+]
 
-    await bot.process_commands(message)
+grandma_times = [
+    datetime.time(hour=7, minute=25),
+    datetime.time(hour=9, minute=25),
+    datetime.time(hour=11, minute=25),
+    datetime.time(hour=13, minute=25),
+    datetime.time(hour=15, minute=25),
+    datetime.time(hour=17, minute=25),
+    datetime.time(hour=19, minute=25),
+    datetime.time(hour=21, minute=25),
+    datetime.time(hour=23, minute=25),
+    datetime.time(hour=1, minute=25),
+    datetime.time(hour=3, minute=25),
+    datetime.time(hour=5, minute=25)
+]
+
+reset_time = datetime.time(hour=7, minute=1)
+
+
+@bot.command(name='skytrack', help='Starts Sky event tracking.')
+async def sky_start(ctx):
+    message = f'Starting Sky tracking.'
+    channel = discord.utils.get(bot.get_all_channels(), name=ctx.channel.name)
+    await channel.send(message)
+    settings["sky"]["sky"] = True
+    settings["sky"]["channel"] = channel.id
+    mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+    await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
+
+
+class SkyTracker(commands.Cog, name="Sky"):
+    def __init__(self, self_bot, ctx):
+        self.bot = self_bot
+        if settings['sky']['geyser']:
+            self.geyser_time_tracking.start()
+        if settings['sky']['grandma']:
+            self.grandma_time_tracking.start()
+        if settings['sky']['channel'] is None:
+            self.sky_channel = ctx.channel
+            settings['channel'] = ctx.channel.id
+        else:
+            self.sky_channel = self.bot.get_channel(settings['sky']['channel'])
+        # setting the URL you want to monitor
+        self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events')
+        self.month_mapper = {
+            1: 'January',
+            2: 'February',
+            3: 'March',
+            4: 'April',
+            5: 'May',
+            6: 'June',
+            7: 'July',
+            8: 'August',
+            9: 'September',
+            10: 'October',
+            11: 'November',
+            12: 'December'
+        }
+        self.base_url = "https://sky-children-of-the-light.fandom.com"
+
+    @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
+    async def sky_geyser(self, ctx):
+        if self.geyser_time_tracking.is_running:
+            self.geyser_time_tracking.stop()
+            settings["sky"]["geyser"] = False
+        else:
+            self.geyser_time_tracking.start()
+            settings["sky"]["geyser"] = True
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+
+    @commands.command(name='skygrandma', help='Enables/disables Grandma monitoring.')
+    async def sky_grandma(self, ctx):
+        if self.grandma_time_tracking.is_running:
+            self.grandma_time_tracking.stop()
+            settings["sky"]["grandma"] = False
+        else:
+            self.grandma_time_tracking.start()
+            settings["sky"]["grandma"] = True
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+
+    @commands.command(name='skych', help='Controls what channel Sky messages will be sent to.')
+    async def sky_channel(self, ctx):
+        ready_message = f'Sky messages will only be sent to this channel.'
+        self.sky_channel = ctx.channel
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        await self.sky_channel.send(ready_message)
+
+    @commands.command(name='daily', help="Check today's seasonal candle locations.")
+    async def check_daily_triggered(self, ctx):
+        await self.check_daily()
+
+    @commands.command(name='skyquit', help='Stop Sky tracking.')
+    async def sky_quit(self, ctx):
+        settings["sky"]["sky"] = False
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        await bot.remove_cog("SkyTracker", guild=ctx.guild)
+
+    def cog_unload(self):
+        self.geyser_time_tracking.cancel()
+        self.grandma_time_tracking.cancel()
+
+    @tasks.loop(time=geyser_times)
+    async def geyser_time_tracking(self):
+        message = f'Geyser is in 10 minutes. Head to Sanctuary Islands in Daylight Prairie!'
+        await self.sky_channel.send(message)
+
+    @tasks.loop(time=grandma_times)
+    async def grandma_time_tracking(self):
+        message = f'Grandma is in 10 minutes. Head to the Elevated Clearing in Hidden Forest!'
+        await self.sky_channel.send(message)
+
+    @tasks.loop(time=reset_time)
+    async def check_daily(self):
+        response = urlopen(self.url).read().decode('utf-8')
+        index = response.index('<a href="/wiki/Season_of_')
+        if index != -1:
+            quote_index = response[index + 9:].index('"')
+            response = urlopen(self.base_url + response[index + 9:index + 9 + quote_index]).read().decode('utf-8')
+            month = self.month_mapper[datetime.datetime.now().month]
+            day = datetime.datetime.now().day
+            today = month + " " + str(day)
+            match = re.search(r"<b>(.*" + today + ".*)</b>", response, re.IGNORECASE)
+            if not match:
+                match = re.search(r"<b>(.*andle rotation .*)</b>", response, re.IGNORECASE)
+            if not match:
+                match = re.search(r"<b>(.*Today's .*)</b>", response, re.IGNORECASE)
+            if match:
+                message = match.group(1)
+                location = re.search(r"otation . in (.*)\.", message).group(1)
+                if not location:
+                    location = re.search(r"in (.*).", message).group(1)
+                if location:
+                    words = location.split(" ")
+                    img_url = str(
+                        re.search(r'(https://static\.wikia\.nocookie\.net/sky-children-of-the-light/images/./../' +
+                                  words[0] + '.*/)revision/.*=\d{14}.*\" title=\"' + words[0],
+                                  response[match.end():],
+                                  re.IGNORECASE).groups(1))
+                    if img_url:
+                        message = message + "\n" + img_url[2:-3]
+                await self.sky_channel.send(message)
+
+
+# @bot.event
+# async def on_message(message):
+#     if message.author == bot.user:
+#         return
+#     if message.content == 'hi':
+#         await message.channel.send('<:rip:280861016911380480>')
+#
+#     await bot.process_commands(message)
 
 
 bot.run(TOKEN)
