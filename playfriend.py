@@ -13,6 +13,10 @@ from discord.ext.commands import Bot
 from dotenv import load_dotenv
 
 from urllib.request import urlopen, Request
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -582,10 +586,13 @@ grandma_times = [
     datetime.time(hour=5, minute=25)
 ]
 
+shard_times = []
+
 reset_time = datetime.time(hour=7, minute=1)
+reset_time_shard = datetime.time(hour=7, minute=0, second=10)
 
 
-@bot.command(name='skytrack', help='Starts Sky event tracking.')
+@bot.command(name='skytrack', help='Starts Sky: Children of Light event tracking.')
 async def sky_start(ctx):
     message = f'Starting Sky tracking.'
     channel = discord.utils.get(bot.get_all_channels(), name=ctx.channel.name)
@@ -596,7 +603,7 @@ async def sky_start(ctx):
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
 
-class SkyTracker(commands.Cog, name="Sky"):
+class SkyTracker(commands.Cog, name="Sky: Children of Light"):
     def __init__(self, self_bot, ctx):
         self.bot = self_bot
         if settings['sky']['geyser']:
@@ -609,7 +616,9 @@ class SkyTracker(commands.Cog, name="Sky"):
         else:
             self.sky_channel = self.bot.get_channel(settings['sky']['channel'])
         # setting the URL you want to monitor
-        self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events')
+        self.url_shard = 'https://sky-shards.pages.dev/en'
+        self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events',
+                           headers={'User-Agent': 'Mozilla/5.0'})
         self.month_mapper = {
             1: 'January',
             2: 'February',
@@ -625,6 +634,7 @@ class SkyTracker(commands.Cog, name="Sky"):
             12: 'December'
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -657,6 +667,10 @@ class SkyTracker(commands.Cog, name="Sky"):
     async def check_daily_triggered(self, ctx):
         await self.check_daily()
 
+    @commands.command(name='shard', help="Check today's shards.")
+    async def check_shard_triggered(self, ctx):
+        await self.check_shard()
+
     @commands.command(name='skyquit', help='Stop Sky tracking.')
     async def sky_quit(self, ctx):
         settings["sky"]["sky"] = False
@@ -666,6 +680,9 @@ class SkyTracker(commands.Cog, name="Sky"):
     def cog_unload(self):
         self.geyser_time_tracking.cancel()
         self.grandma_time_tracking.cancel()
+        self.shard_time_tracking.cancel()
+        self.check_daily.cancel()
+        self.check_shard.cancel()
 
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
@@ -676,6 +693,10 @@ class SkyTracker(commands.Cog, name="Sky"):
     async def grandma_time_tracking(self):
         message = f'Grandma is in 10 minutes. Head to the Elevated Clearing in Hidden Forest!'
         await self.sky_channel.send(message)
+
+    @tasks.loop(time=shard_times)
+    async def shard_time_tracking(self):
+        await self.check_shard()
 
     @tasks.loop(time=reset_time)
     async def check_daily(self):
@@ -708,6 +729,35 @@ class SkyTracker(commands.Cog, name="Sky"):
                         message = message + "\n" + img_url[2:-3]
                 await self.sky_channel.send(message)
 
+    @tasks.loop(time=reset_time_shard)
+    async def check_shard(self):
+        global shard_times
+        self.driver.get(self.url_shard)
+        bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
+        reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
+        times = self.driver.find_elements(By.XPATH, "//*[contains(text(), ':')]")
+        pattern = re.compile("..:.. (A|P)M")
+        filtered_times = [element for element in times if pattern.search(element.text)]
+        if bold_class[0].text.startswith("R"):
+            item = "ascended candles"
+        else:
+            item = "wax"
+        converted_times = []
+        new_check_times = []
+        now = str(datetime.datetime.now()).split(" ")[0]
+        for i in range(2,8):
+            x = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
+            seconds = round(x.timestamp())
+            converted_times.append(f"<t:{seconds}:t>")
+            if i in [0, 2, 4]:
+                new_check_times.append(x)
+        shard_times = new_check_times
+        message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
+                   + f"1st shard: {converted_times[0]} to {converted_times[1]}\n"
+                     f"2nd shard: {converted_times[2]} to {converted_times[3]}\n"
+                     f"3rd shard: {converted_times[4]} to {converted_times[5]}\n" +
+                     self.url_shard)
+        await self.sky_channel.send(message)
 
 # @bot.event
 # async def on_message(message):

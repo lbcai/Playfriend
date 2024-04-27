@@ -10,6 +10,8 @@ MarkupSafe==2.1.1
 honcho==1.1.0
 dnspython==2.2.1
 requests==2.25.1
+selenium==4.20.0
+webdriver-manager==4.0.1
 
 pip~=22.1
 wheel~=0.36.2
