@@ -45,7 +45,7 @@ guild = None
 if prod:
     # for headless chrome selenium web scraping
     options = Options()
-    options.add_argument("--remote-debugging-port=$PORT")
+    options.add_argument("--remote-debugging-port=33507")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.headless = True
@@ -103,13 +103,11 @@ class Tictactoe(commands.Cog):
         self.ttt_first_player = 0
 
         if ttt_game_dictionary[ctx.channel][2] is not f'{bot.user.name}':
-            player_2 = ttt_game_dictionary[ctx.channel][2].name + "#" + ttt_game_dictionary[ctx.channel][
-                2].discriminator
+            player_2 = ttt_game_dictionary[ctx.channel][2].name
         else:
             player_2 = f'{bot.user.name}'
         today_date = datetime.date.today()
-        self.game_doc = {'player1': ttt_game_dictionary[ctx.channel][1].name +
-                                    "#" + ttt_game_dictionary[ctx.channel][1].discriminator,
+        self.game_doc = {'player1': ttt_game_dictionary[ctx.channel][1].name,
                          'player2': player_2, 'game': 'Tic-Tac-Toe',
                          'date': '%s/%s/%s' % (today_date.month, today_date.day,
                                                today_date.year)}
@@ -479,7 +477,7 @@ class Hangman(commands.Cog):
                           f'which means {hm_game_dictionary[ctx.channel].word[1]}.'
             await ctx.channel.send(bot_message)
             self.game_doc['status'] = 'Hung'
-            self.game_doc['lastplayer'] = ctx.message.author.name + "#" + ctx.message.author.discriminator
+            self.game_doc['lastplayer'] = ctx.message.author.name
             mongo_db.games.insert_one(self.game_doc)
             await self.hangman_quit_helper(ctx)
 
@@ -488,7 +486,7 @@ class Hangman(commands.Cog):
                       f'which means {hm_game_dictionary[ctx.channel].word[1]}.'
         await ctx.channel.send(bot_message)
         self.game_doc['status'] = 'Survived'
-        self.game_doc['lastplayer'] = ctx.message.author.name + "#" + ctx.message.author.discriminator
+        self.game_doc['lastplayer'] = ctx.message.author.name
         mongo_db.games.insert_one(self.game_doc)
         await self.hangman_quit_helper(ctx)
 
