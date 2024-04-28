@@ -41,17 +41,17 @@ settings = {
     }
 }
 guild = None
-
+options = webdriver.ChromeOptions()
 if prod:
     # for headless chrome selenium web scraping
-    options = webdriver.ChromeOptions()
     options.add_argument('--headless=new')
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
-    options.headless = True
+else:
+    options.add_argument("--start-maximized")
 
 MONGODB_URI = os.getenv('MONGODB_URI')
 # Connect to database
@@ -752,30 +752,35 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         global shard_times
         self.driver.get(self.url_shard)
         bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
-        reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
+
         times = self.driver.find_elements(By.XPATH, "//*[contains(text(), ':')]")
         pattern = re.compile("..:.. (A|P)M")
         filtered_times = [element for element in times if pattern.search(element.text)]
-        if bold_class[0].text.startswith("R"):
-            item = "ascended candles"
+        if bold_class[0].text.startswith("N"):
+            message = (f"Today there are no shard eruptions.\n" + self.url_shard)
+            await self.sky_channel.send(message)
         else:
-            item = "wax"
-        converted_times = []
-        new_check_times = []
-        now = str(datetime.datetime.now()).split(" ")[0]
-        for i in range(2,8):
-            x = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
-            seconds = round(x.timestamp())
-            converted_times.append(f"<t:{seconds}:t>")
-            if i in [0, 2, 4]:
-                new_check_times.append(x)
-        shard_times = new_check_times
-        message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
-                   + f"1st shard: {converted_times[0]} to {converted_times[1]}\n"
-                     f"2nd shard: {converted_times[2]} to {converted_times[3]}\n"
-                     f"3rd shard: {converted_times[4]} to {converted_times[5]}\n" +
-                     self.url_shard)
-        await self.sky_channel.send(message)
+            if bold_class[0].text.startswith("R"):
+                item = "ascended candles"
+            else:
+                item = "wax"
+            reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
+            converted_times = []
+            new_check_times = []
+            now = str(datetime.datetime.now()).split(" ")[0]
+            for i in range(2, 8):
+                x = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
+                seconds = round(x.timestamp())
+                converted_times.append(f"<t:{seconds}:t>")
+                if i in [0, 2, 4]:
+                    new_check_times.append(x)
+            shard_times = new_check_times
+            message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
+                       + f"1st shard: {converted_times[0]} to {converted_times[1]}\n"
+                         f"2nd shard: {converted_times[2]} to {converted_times[3]}\n"
+                         f"3rd shard: {converted_times[4]} to {converted_times[5]}\n" +
+                         self.url_shard)
+            await self.sky_channel.send(message)
 
 # @bot.event
 # async def on_message(message):
