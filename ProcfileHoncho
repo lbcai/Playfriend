@@ -1,2 +1,2 @@
 web: python app.py -p $PORT
-worker: python playfriend.py
+worker: python playfriend.py prod

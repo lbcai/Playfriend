@@ -1,6 +1,7 @@
 import os
 import random
 import datetime
+import sys
 
 import discord
 import emojis
@@ -14,9 +15,15 @@ from dotenv import load_dotenv
 
 from urllib.request import urlopen, Request
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+
+if len(sys.argv) > 1:
+    prod = sys.argv[1]
+else:
+    prod = None
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -34,6 +41,14 @@ settings = {
     }
 }
 guild = None
+
+if prod:
+    # for headless chrome selenium web scraping
+    options = Options()
+    options.binary_location = "${PATH}:/opt/render/project/.render/chrome/opt/google/chrome"
+    options.add_argument("--start-maximized")
+    options.add_argument("--no-sandbox")
+    options.headless = True
 
 MONGODB_URI = os.getenv('MONGODB_URI')
 # Connect to database
@@ -633,7 +648,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             12: 'December'
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -674,6 +689,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
     async def sky_quit(self, ctx):
         settings["sky"]["sky"] = False
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        message = f'Turning off Sky notifications.'
+        await self.sky_channel.send(message)
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
     def cog_unload(self):
