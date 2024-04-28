@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: playfriend
+    name: playfriend-render
     runtime: python
     plan: free
     buildCommand: 'bash ./render-build.sh; pip install -r ./requirements.txt'

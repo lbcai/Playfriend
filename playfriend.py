@@ -45,7 +45,7 @@ guild = None
 if prod:
     # for headless chrome selenium web scraping
     options = Options()
-    options.binary_location = "${PATH}:/opt/render/project/.render/chrome/opt/google/chrome"
+    options.add_argument("--remote-debugging-port=$PORT")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.headless = True
