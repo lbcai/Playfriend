@@ -44,8 +44,11 @@ guild = None
 
 if prod:
     # for headless chrome selenium web scraping
-    options = Options()
-    options.add_argument("--remote-debugging-port=33507")
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless=new')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.headless = True
@@ -646,7 +649,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             12: 'December'
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        self.driver = webdriver.Chrome(options=options)
+        self.driver.set_page_load_timeout(90)
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):

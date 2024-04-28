@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: 'bash ./render-build.sh; pip install -r ./requirements.txt'
-    startCommand: 'export PATH="${PATH}:/opt/render/project/.render/chrome/opt/google/chrome"; honcho -f ProcfileHoncho start'
+    startCommand: 'export PATH="/opt/render/project/.render/chrome/opt/google/chrome:$PATH"; echo "Current PATH: $PATH"; honcho -f ProcfileHoncho start'
     envVars:
      - key: DISCORD_TOKEN
        sync: false
