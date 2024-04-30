@@ -729,7 +729,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         await self.check_shard()
         print(f"[{datetime.datetime.now()}] [INFO    ] ", "current shard times list: ", file=sys.stderr)
         for item in shard_times:
-            print(item, file=sys.stderr)
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", item, file=sys.stderr)
 
     @tasks.loop(time=reset_time)
     async def check_daily(self):
