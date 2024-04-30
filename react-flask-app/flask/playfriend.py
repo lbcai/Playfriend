@@ -2,6 +2,7 @@ import os
 import random
 import datetime
 import sys
+import logging
 
 import discord
 import emojis
@@ -726,9 +727,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
     @tasks.loop(time=shard_times)
     async def shard_time_tracking(self):
         await self.check_shard()
-        print("current shard times list: ")
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "current shard times list: ", file=sys.stderr)
         for item in shard_times:
-            print(item)
+            print(item, file=sys.stderr)
 
     @tasks.loop(time=reset_time)
     async def check_daily(self):
@@ -759,7 +760,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                                   re.IGNORECASE).groups(1))
                     if img_url:
                         message = message + "\n" + img_url[2:-3]
+                print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
+                      time_until_end_of_day(), file=sys.stderr)
                 await self.sky_channel.send(message, delete_after=time_until_end_of_day())
+            else:
+                print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find candle rotation", file=sys.stderr)
+        else:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find current season", file=sys.stderr)
 
     @tasks.loop(time=reset_time_shard)
     async def check_shard(self):
@@ -807,6 +814,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             if now_dt >= converted_times[5][1]:
                 message += "All shard windows have passed for today."
             message += self.url_shard
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
+                  int(deletion_time.total_seconds()), file=sys.stderr)
             await self.sky_channel.send(message, delete_after=int(deletion_time.total_seconds()))
 
 
