@@ -761,8 +761,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                     if img_url:
                         message = message + "\n" + img_url[2:-3]
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
-                      time_until_end_of_day(), file=sys.stderr)
-                await self.sky_channel.send(message, delete_after=time_until_end_of_day())
+                      int(time_until_end_of_day().total_seconds()), file=sys.stderr)
+                await self.sky_channel.send(message, delete_after=int(time_until_end_of_day().total_seconds()))
             else:
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find candle rotation", file=sys.stderr)
         else:
