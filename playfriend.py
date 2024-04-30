@@ -15,10 +15,7 @@ from dotenv import load_dotenv
 
 from urllib.request import urlopen, Request
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 
 if len(sys.argv) > 1:
     prod = sys.argv[1]
@@ -58,6 +55,17 @@ MONGODB_URI = os.getenv('MONGODB_URI')
 client = pymongo.MongoClient(MONGODB_URI)
 mongo_db = client.db
 mongo_db.launches.drop()
+
+
+def time_until_end_of_day(dt=None):
+    """
+    Get timedelta until end of day on the datetime passed, or current time.
+    https://stackoverflow.com/questions/45986035/seconds-until-end-of-day-in-python
+    """
+    if dt is None:
+        dt = datetime.datetime.now()
+    tomorrow = dt + datetime.timedelta(days=1)
+    return datetime.datetime.combine(tomorrow, datetime.time.min) - dt
 
 
 class Dungeon(commands.Cog):
@@ -614,7 +622,7 @@ async def sky_start(ctx):
     await channel.send(message)
     settings["sky"]["sky"] = True
     settings["sky"]["channel"] = channel.id
-    mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+    mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
 
@@ -650,7 +658,10 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
         self.driver = webdriver.Chrome(options=options)
-        self.driver.set_page_load_timeout(90)
+
+        self.check_daily.start()
+        self.check_shard.start()
+        self.shard_time_tracking.start()
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -660,7 +671,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         else:
             self.geyser_time_tracking.start()
             settings["sky"]["geyser"] = True
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
     @commands.command(name='skygrandma', help='Enables/disables Grandma monitoring.')
     async def sky_grandma(self, ctx):
@@ -670,13 +681,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         else:
             self.grandma_time_tracking.start()
             settings["sky"]["grandma"] = True
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
     @commands.command(name='skych', help='Controls what channel Sky messages will be sent to.')
     async def sky_channel(self, ctx):
         ready_message = f'Sky messages will only be sent to this channel.'
         self.sky_channel = ctx.channel
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
         await self.sky_channel.send(ready_message)
 
     @commands.command(name='daily', help="Check today's seasonal candle locations.")
@@ -685,12 +696,12 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
     @commands.command(name='shard', help="Check today's shards.")
     async def check_shard_triggered(self, ctx):
-        await self.check_shard()
+        await self.shard_time_tracking()
 
     @commands.command(name='skyquit', help='Stop Sky tracking.')
     async def sky_quit(self, ctx):
         settings["sky"]["sky"] = False
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': { "settings": settings } })
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
         message = f'Turning off Sky notifications.'
         await self.sky_channel.send(message)
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
@@ -705,16 +716,19 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
         message = f'Geyser is in 10 minutes. Head to Sanctuary Islands in Daylight Prairie!'
-        await self.sky_channel.send(message)
+        await self.sky_channel.send(message, delete_after=600)
 
     @tasks.loop(time=grandma_times)
     async def grandma_time_tracking(self):
         message = f'Grandma is in 10 minutes. Head to the Elevated Clearing in Hidden Forest!'
-        await self.sky_channel.send(message)
+        await self.sky_channel.send(message, delete_after=600)
 
     @tasks.loop(time=shard_times)
     async def shard_time_tracking(self):
         await self.check_shard()
+        print("current shard times list: ")
+        for item in shard_times:
+            print(item)
 
     @tasks.loop(time=reset_time)
     async def check_daily(self):
@@ -745,7 +759,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                                   re.IGNORECASE).groups(1))
                     if img_url:
                         message = message + "\n" + img_url[2:-3]
-                await self.sky_channel.send(message)
+                await self.sky_channel.send(message, delete_after=time_until_end_of_day())
 
     @tasks.loop(time=reset_time_shard)
     async def check_shard(self):
@@ -767,20 +781,34 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
             converted_times = []
             new_check_times = []
-            now = str(datetime.datetime.now()).split(" ")[0]
+            now_dt = datetime.datetime.now()
+            now = str(now_dt).split(" ")[0]
             for i in range(2, 8):
                 x = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
                 seconds = round(x.timestamp())
-                converted_times.append(f"<t:{seconds}:t>")
-                if i in [0, 2, 4]:
+                converted_times.append((f"<t:{seconds}:t>", x))
+                if i in [2, 4, 6]:
                     new_check_times.append(x)
-            shard_times = new_check_times
-            message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
-                       + f"1st shard: {converted_times[0]} to {converted_times[1]}\n"
-                         f"2nd shard: {converted_times[2]} to {converted_times[3]}\n"
-                         f"3rd shard: {converted_times[4]} to {converted_times[5]}\n" +
-                         self.url_shard)
-            await self.sky_channel.send(message)
+            shard_times = []
+            message = f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
+            deletion_time = time_until_end_of_day()
+            if now_dt < converted_times[1][1]:
+                message += f"1st shard: {converted_times[0][0]} to {converted_times[1][0]}\n"
+                shard_times.append(converted_times[0][1])
+                deletion_time = converted_times[1][1] - now_dt
+            if now_dt < converted_times[3][1]:
+                message += f"2nd shard: {converted_times[2][0]} to {converted_times[3][0]}\n"
+                shard_times.append(converted_times[2][1])
+                deletion_time = converted_times[3][1] - now_dt
+            if now_dt < converted_times[5][1]:
+                message += f"3rd shard: {converted_times[4][0]} to {converted_times[5][0]}\n"
+                shard_times.append(converted_times[4][1])
+                deletion_time = converted_times[5][1] - now_dt
+            if now_dt >= converted_times[5][1]:
+                message += "All shard windows have passed for today."
+            message += self.url_shard
+            await self.sky_channel.send(message, delete_after=int(deletion_time.total_seconds()))
+
 
 # @bot.event
 # async def on_message(message):
