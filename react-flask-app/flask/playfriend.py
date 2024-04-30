@@ -2,7 +2,6 @@ import os
 import random
 import datetime
 import sys
-import logging
 
 import discord
 import emojis
@@ -39,6 +38,7 @@ settings = {
     }
 }
 guild = None
+
 options = webdriver.ChromeOptions()
 if prod:
     # for headless chrome selenium web scraping
