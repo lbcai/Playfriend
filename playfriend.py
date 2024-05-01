@@ -613,7 +613,7 @@ grandma_times = [
 
 reset_time = datetime.time(hour=7, minute=1)
 reset_time_shard = datetime.time(hour=7, minute=0, second=10)
-shard_times = [reset_time_shard]
+shard_times = [datetime.time(hour=7, minute=25)]
 
 
 @bot.command(name='skytrack', help='Starts Sky: Children of Light event tracking.')
@@ -784,8 +784,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             if bold_class[0].text.startswith("R"):
                 item = "ascended candles"
             else:
-                item = "wax"
+                item = "cakes of wax"
             reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
+            num_list = re.findall(r'\d+\.?\d?', reward)
             converted_times = []
             new_check_times = []
             now_dt = datetime.datetime.now()
@@ -797,22 +798,28 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                 if i in [2, 4, 6]:
                     new_check_times.append(x)
             shard_times = []
-            message = f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}. {reward} {item}.\n"
-            deletion_time = time_until_end_of_day()
+            message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}."
+                       f" The reward is {num_list[0]} {item}.\n")
+            deletion_time = None
             if now_dt < converted_times[1][1]:
                 message += f"1st shard: {converted_times[0][0]} to {converted_times[1][0]}\n"
                 shard_times.append(converted_times[0][1])
-                deletion_time = converted_times[1][1] - now_dt
+                if not deletion_time:
+                    deletion_time = converted_times[1][1] - now_dt
             if now_dt < converted_times[3][1]:
                 message += f"2nd shard: {converted_times[2][0]} to {converted_times[3][0]}\n"
                 shard_times.append(converted_times[2][1])
-                deletion_time = converted_times[3][1] - now_dt
+                if not deletion_time:
+                    deletion_time = converted_times[3][1] - now_dt
             if now_dt < converted_times[5][1]:
                 message += f"3rd shard: {converted_times[4][0]} to {converted_times[5][0]}\n"
                 shard_times.append(converted_times[4][1])
-                deletion_time = converted_times[5][1] - now_dt
+                if not deletion_time:
+                    deletion_time = converted_times[5][1] - now_dt
             if now_dt >= converted_times[5][1]:
                 message += "All shard windows have passed for today."
+                if not deletion_time:
+                    deletion_time = time_until_end_of_day()
             message += self.url_shard
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
                   int(deletion_time.total_seconds()), file=sys.stderr)
