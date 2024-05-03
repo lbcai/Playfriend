@@ -67,7 +67,7 @@ def time_until_end_of_day(dt=None):
     if dt is None:
         dt = datetime.datetime.now()
     tomorrow = dt + datetime.timedelta(days=1)
-    return datetime.datetime.combine(tomorrow, datetime.time.min) - dt
+    return int((datetime.datetime.combine(tomorrow, datetime.time.min) - dt).total_seconds())
 
 
 class Dungeon(commands.Cog):
@@ -759,8 +759,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                     if img_url:
                         message = message + "\n" + img_url[2:-3]
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
-                      int(time_until_end_of_day().total_seconds()), file=sys.stderr)
-                await self.sky_channel.send(message, delete_after=int(time_until_end_of_day().total_seconds()))
+                      time_until_end_of_day(), file=sys.stderr)
+                await self.sky_channel.send(message, delete_after=time_until_end_of_day())
             else:
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find candle rotation", file=sys.stderr)
         else:
@@ -769,9 +769,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
     @tasks.loop(time=shard_times)
     async def check_shard(self):
         global shard_times
-        print(f"[{datetime.datetime.now()}] [INFO    ] ", "current shard times list: ", file=sys.stderr)
-        for item in shard_times:
-            print(f"[{datetime.datetime.now()}] [INFO    ] ", item, file=sys.stderr)
 
         self.driver.get(self.url_shard)
         bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
@@ -806,23 +803,28 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             if now_dt < converted_times[1][1]:
                 message += f"1st shard: {converted_times[0][0]} to {converted_times[1][0]}\n"
                 if not deletion_time:
-                    deletion_time = converted_times[1][1] - now_dt
+                    deletion_time = int((converted_times[1][1] - now_dt).total_seconds())
             if now_dt < converted_times[3][1]:
                 message += f"2nd shard: {converted_times[2][0]} to {converted_times[3][0]}\n"
                 if not deletion_time:
-                    deletion_time = converted_times[3][1] - now_dt
+                    deletion_time = int((converted_times[3][1] - now_dt).total_seconds())
             if now_dt < converted_times[5][1]:
                 message += f"3rd shard: {converted_times[4][0]} to {converted_times[5][0]}\n"
                 if not deletion_time:
-                    deletion_time = converted_times[5][1] - now_dt
+                    deletion_time = int((converted_times[5][1] - now_dt).total_seconds())
             if now_dt >= converted_times[5][1]:
                 message += "All shard windows have passed for today."
                 if not deletion_time:
                     deletion_time = time_until_end_of_day()
             message += self.url_shard
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
-                  int(deletion_time.total_seconds()), file=sys.stderr)
-            await self.sky_channel.send(message, delete_after=int(deletion_time.total_seconds()))
+                  deletion_time, file=sys.stderr)
+            await self.sky_channel.send(message, delete_after=deletion_time)
+            self.check_shard.change_interval(time=shard_times)
+
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "current shard times list: ", file=sys.stderr)
+        for item in shard_times:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", item, file=sys.stderr)
 
     @tasks.loop(time=reset_time)
     async def check_ts(self):
@@ -843,13 +845,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                           time_to_delete, file=sys.stderr)
                     message = (f"The next traveling spirit is {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
                                f"{spirit_url}")
-                    await self.sky_channel.send(message, delete_after=time_to_delete)
+                    await self.sky_channel.send(message, delete_after=time_until_end_of_day())
                 else:
                     message = (
                         f"The last traveling spirit was {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
                         f"The next traveling spirit has not been announced yet.\n"
                         f"{spirit_url}")
-                    await self.sky_channel.send(message, delete_after=int(time_until_end_of_day().total_seconds()))
+                    await self.sky_channel.send(message, delete_after=time_until_end_of_day())
             else:
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find date of next spirit", file=sys.stderr)
                 message = (f"The next traveling spirit is {spirit}.\n"
