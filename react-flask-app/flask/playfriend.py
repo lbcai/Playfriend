@@ -1,8 +1,9 @@
-import copy
 import os
 import random
 import datetime
 import sys
+import sched
+import time
 
 import discord
 import emojis
@@ -613,7 +614,6 @@ grandma_times = [
 ]
 
 reset_time = datetime.time(hour=7, minute=1)
-shard_times = [datetime.time(hour=7, minute=0, second=10)]
 
 
 @bot.command(name='skytrack', help='Starts Sky: Children of Light event tracking.')
@@ -644,7 +644,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events',
                            headers={'User-Agent': 'Mozilla/5.0'})
         self.url_ts = Request('https://sky-children-of-the-light.fandom.com/wiki/Spirit_Visits',
-                           headers={'User-Agent': 'Mozilla/5.0'})
+                              headers={'User-Agent': 'Mozilla/5.0'})
         self.month_mapper = {
             1: 'January',
             2: 'February',
@@ -661,6 +661,10 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
         self.driver = webdriver.Chrome(options=options)
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.converted_times = []
+        self.shard_message = ""
+        self.jobs = []
 
         self.check_daily.start()
         self.check_shard.start()
@@ -699,7 +703,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
     @commands.command(name='shard', help="Check today's shards.")
     async def check_shard_triggered(self, ctx):
-        await self.check_shard()
+        await self.send_shard_msg()
 
     @commands.command(name='ts', help="Check if there is news about the next traveling spirit.")
     async def check_ts_triggered(self, ctx):
@@ -718,6 +722,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.grandma_time_tracking.cancel()
         self.check_daily.cancel()
         self.check_shard.cancel()
+        self.clear_jobs()
 
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
@@ -766,9 +771,53 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         else:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find current season", file=sys.stderr)
 
-    @tasks.loop(time=shard_times)
+    async def send_shard_msg(self):
+        message = self.shard_message
+        if len(self.converted_times) > 0:
+            now_dt = datetime.datetime.now()
+            deletion_time = None
+            if now_dt < self.converted_times[1][1]:
+                message += f"1st shard: <t:{self.converted_times[0][0]}:t> to <t:{self.converted_times[1][0]}:t>\n"
+                if not deletion_time:
+                    deletion_time = int((self.converted_times[1][1] - now_dt).total_seconds())
+            if now_dt < self.converted_times[3][1]:
+                message += f"2nd shard: <t:{self.converted_times[2][0]}:t> to <t:{self.converted_times[3][0]}:t>\n"
+                if not deletion_time:
+                    deletion_time = int((self.converted_times[3][1] - now_dt).total_seconds())
+            if now_dt < self.converted_times[5][1]:
+                message += f"3rd shard: <t:{self.converted_times[4][0]}:t> to <t:{self.converted_times[5][0]}:t>\n"
+                if not deletion_time:
+                    deletion_time = int((self.converted_times[5][1] - now_dt).total_seconds())
+            if now_dt >= self.converted_times[5][1]:
+                message += "All shard windows have passed for today.\n"
+                if not deletion_time:
+                    deletion_time = time_until_end_of_day()
+            message += self.url_shard
+        else:
+            deletion_time = time_until_end_of_day()
+
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
+              deletion_time, file=sys.stderr)
+        await self.sky_channel.send(message, delete_after=deletion_time)
+
+    @commands.command(name='test', help='test.')
+    async def test(self, ctx):
+        await self.check_shard()
+        print(self.scheduler.queue)
+
+    def clear_jobs(self):
+        if len(self.scheduler.queue) > 0:
+            for job in self.jobs:
+                try:
+                    self.scheduler.cancel(job)
+                except ValueError:
+                    continue
+        self.jobs = []
+
+    @tasks.loop(time=reset_time)
     async def check_shard(self):
-        global shard_times
+        self.converted_times = []
+        self.clear_jobs()
 
         self.driver.get(self.url_shard)
         bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
@@ -777,8 +826,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         pattern = re.compile("..:.. (A|P)M")
         filtered_times = [element for element in times if pattern.search(element.text)]
         if bold_class[0].text.startswith("N"):
-            message = (f"Today there are no shard eruptions.\n" + self.url_shard)
-            await self.sky_channel.send(message)
+            self.shard_message = (f"Today there are no shard eruptions.\n" + self.url_shard)
         else:
             if bold_class[0].text.startswith("R"):
                 item = "ascended candles"
@@ -787,44 +835,23 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
             num_list = re.findall(r'\d+\.?\d?', reward)
             converted_times = []
-            new_check_times = []
-            now_dt = datetime.datetime.now()
-            now = str(now_dt).split(" ")[0]
+            now = str(datetime.datetime.now()).split(" ")[0]
             for i in range(2, 8):
-                x = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
-                seconds = round(x.timestamp())
-                converted_times.append((f"<t:{seconds}:t>", x))
-                if i in [2, 4, 6]:
-                    new_check_times.append(x.time())
-            shard_times = copy.deepcopy(new_check_times)
-            message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}."
-                       f" The reward is {num_list[0]} {item}.\n")
-            deletion_time = None
-            if now_dt < converted_times[1][1]:
-                message += f"1st shard: {converted_times[0][0]} to {converted_times[1][0]}\n"
-                if not deletion_time:
-                    deletion_time = int((converted_times[1][1] - now_dt).total_seconds())
-            if now_dt < converted_times[3][1]:
-                message += f"2nd shard: {converted_times[2][0]} to {converted_times[3][0]}\n"
-                if not deletion_time:
-                    deletion_time = int((converted_times[3][1] - now_dt).total_seconds())
-            if now_dt < converted_times[5][1]:
-                message += f"3rd shard: {converted_times[4][0]} to {converted_times[5][0]}\n"
-                if not deletion_time:
-                    deletion_time = int((converted_times[5][1] - now_dt).total_seconds())
-            if now_dt >= converted_times[5][1]:
-                message += "All shard windows have passed for today."
-                if not deletion_time:
-                    deletion_time = time_until_end_of_day()
-            message += self.url_shard
-            print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
-                  deletion_time, file=sys.stderr)
-            await self.sky_channel.send(message, delete_after=deletion_time)
-            self.check_shard.change_interval(time=shard_times)
+                start = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
+                seconds = round(start.timestamp())
+                converted_times.append((seconds, start))
 
-        print(f"[{datetime.datetime.now()}] [INFO    ] ", "current shard times list: ", file=sys.stderr)
-        for item in shard_times:
-            print(f"[{datetime.datetime.now()}] [INFO    ] ", item, file=sys.stderr)
+            self.converted_times = converted_times
+            self.shard_message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}."
+                                  f" The reward is {num_list[0]} {item}.\n")
+
+            for i in range(0, len(self.converted_times), 2):
+                job = self.scheduler.enterabs(self.converted_times[i][0], 0, self.send_shard_msg)
+                self.jobs.append(job)
+            self.jobs = self.jobs[::-1]
+
+        await self.send_shard_msg()
+        self.scheduler.run(blocking=False)
 
     @tasks.loop(time=reset_time)
     async def check_ts(self):
@@ -843,8 +870,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                 if time_to_delete > 0:
                     print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until message deletion: ",
                           time_to_delete, file=sys.stderr)
-                    message = (f"The next traveling spirit is {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
-                               f"{spirit_url}")
+                    message = (
+                        f"The next traveling spirit is {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
+                        f"{spirit_url}")
                     await self.sky_channel.send(message, delete_after=time_until_end_of_day())
                 else:
                     message = (
