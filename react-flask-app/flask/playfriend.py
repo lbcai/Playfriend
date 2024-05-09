@@ -853,7 +853,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             quote_index = response[index + 13:].index('"')
             spirit_url = self.base_url + response[index + 13:index + 13 + quote_index]
             spirit = response[index + 19:index + 13 + quote_index].replace("_", " ")
-            match = re.search(r"[A-Za-z]{3} \d\d, \d\d\d\d", response[index + 13:], re.IGNORECASE)
+            match = re.search(r"[A-Za-z]{3} \d?\d, \d\d\d\d", response[index + 13:index + 1013], re.IGNORECASE)
             if match:
                 date = match.group(0)
                 converted_date = datetime.datetime.strptime(date, '%b %d, %Y')
