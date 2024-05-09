@@ -2,7 +2,7 @@ import os
 import random
 import datetime
 import sys
-import sched
+import asyncio
 import time
 
 import discord
@@ -661,7 +661,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         }
         self.base_url = "https://sky-children-of-the-light.fandom.com"
         self.driver = webdriver.Chrome(options=options)
-        self.scheduler = sched.scheduler(time.time, time.sleep)
         self.converted_times = []
         self.shard_message = ""
         self.jobs = []
@@ -703,7 +702,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
     @commands.command(name='shard', help="Check today's shards.")
     async def check_shard_triggered(self, ctx):
-        await self.send_shard_msg()
+        await self.send_shard_msg(datetime.datetime.now())
 
     @commands.command(name='ts', help="Check if there is news about the next traveling spirit.")
     async def check_ts_triggered(self, ctx):
@@ -771,7 +770,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         else:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find current season", file=sys.stderr)
 
-    async def send_shard_msg(self):
+    async def send_shard_msg(self, time_to_wait):
+        await discord.utils.sleep_until(time_to_wait)
         if self.shard_message == "":
             await self.check_shard()
         else:
@@ -803,18 +803,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                   deletion_time, file=sys.stderr)
             await self.sky_channel.send(message, delete_after=deletion_time)
 
-    @commands.command(name='test', help='test.')
-    async def test(self, ctx):
-        await self.check_shard()
-        print(self.scheduler.queue)
-
     def clear_jobs(self):
-        if len(self.scheduler.queue) > 0:
-            for job in self.jobs:
-                try:
-                    self.scheduler.cancel(job)
-                except ValueError:
-                    continue
+        for task in self.jobs:
+            task.cancel()
         self.jobs = []
 
     @tasks.loop(time=reset_time)
@@ -850,12 +841,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                                   f" The reward is {num_list[0]} {item}.\n")
 
             for i in range(0, len(self.converted_times), 2):
-                job = self.scheduler.enterabs(self.converted_times[i][0], 0, self.send_shard_msg)
-                self.jobs.append(job)
-            self.jobs = self.jobs[::-1]
+                await asyncio.create_task(self.send_shard_msg(self.converted_times[i][1]))
 
-        await self.send_shard_msg()
-        self.scheduler.run(blocking=False)
+        await self.send_shard_msg(datetime.datetime.now())
 
     @tasks.loop(time=reset_time)
     async def check_ts(self):
