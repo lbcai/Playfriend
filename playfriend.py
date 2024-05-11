@@ -702,7 +702,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
     @commands.command(name='shard', help="Check today's shards.")
     async def check_shard_triggered(self, ctx):
-        await self.send_shard_msg(datetime.datetime.now())
+        await self.send_shard_msg(None)
 
     @commands.command(name='ts', help="Check if there is news about the next traveling spirit.")
     async def check_ts_triggered(self, ctx):
@@ -813,6 +813,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
     @tasks.loop(time=reset_time)
     async def check_shard(self):
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "checking shard...", file=sys.stderr)
         self.converted_times = []
         self.shard_message = ""
         self.clear_jobs()
