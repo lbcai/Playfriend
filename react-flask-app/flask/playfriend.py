@@ -13,6 +13,7 @@ import pymongo
 from discord import Intents
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot
+from discord.ext.commands.view import StringView
 from dotenv import load_dotenv
 
 from urllib.request import urlopen, Request
@@ -672,11 +673,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.check_daily.start()
         self.check_shard.start()
 
-        # one time trigger for daily loops on startup
-        self.check_ts_triggered(ctx)
-        self.check_daily_triggered(ctx)
-        self.check_shard_triggered(ctx)
-
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
         if self.geyser_time_tracking.is_running:
@@ -723,6 +719,12 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         message = f'Turning off Sky notifications.'
         await self.sky_channel.send(message)
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
+
+    async def cog_load(self):
+        # one time trigger for daily loops on startup
+        await self.check_ts()
+        await self.check_daily()
+        await self.send_shard_msg(None)
 
     def cog_unload(self):
         self.geyser_time_tracking.cancel()
@@ -779,6 +781,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find current season", file=sys.stderr)
 
     async def send_shard_msg(self, time_to_wait):
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "printing shard message...time_to_wait param: ", time_to_wait,
+              file=sys.stderr)
         if time_to_wait is not None:
             await discord.utils.sleep_until(time_to_wait)
         if self.shard_message == "":
@@ -834,6 +838,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         filtered_times = [element for element in times if pattern.search(element.text)]
         if bold_class[0].text.startswith("N"):
             self.shard_message = (f"Today there are no shard eruptions.\n" + self.url_shard)
+            await self.send_shard_msg(None)
         else:
             if bold_class[0].text.startswith("R"):
                 item = "ascended candles"
@@ -852,11 +857,11 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             self.shard_message = (f"Today's {bold_class[0].text} is in {bold_class[1].text}, {bold_class[2].text}."
                                   f" The reward is {num_list[0]} {item}.\n")
 
+            await self.send_shard_msg(None)
+
             for i in range(0, len(self.converted_times), 2):
                 if datetime.datetime.now() <= self.converted_times[i][1]:
                     await asyncio.create_task(self.send_shard_msg(self.converted_times[i][1]))
-
-        await self.send_shard_msg(None)
 
     @tasks.loop(time=reset_time)
     async def check_ts(self):
