@@ -659,15 +659,23 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             11: 'November',
             12: 'December'
         }
+
+        # use for shard web scraping and message scheduling
         self.base_url = "https://sky-children-of-the-light.fandom.com"
         self.driver = webdriver.Chrome(options=options)
         self.converted_times = []
         self.shard_message = ""
         self.jobs = []
 
+        # start daily loops
+        self.check_ts.start()
         self.check_daily.start()
         self.check_shard.start()
-        self.check_ts.start()
+
+        # one time trigger for daily loops on startup
+        self.check_ts_triggered(ctx)
+        self.check_daily_triggered(ctx)
+        self.check_shard_triggered(ctx)
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
