@@ -737,6 +737,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         await ctx.message.delete()
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
+    @commands.command(name='test', help="Run daily loops (test).")
+    async def check_test(self, ctx):
+        await self.check_ts()
+        await self.check_daily()
+        await self.check_shard()
+        await ctx.message.delete()
+
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
         await self.send_shard_msg(None)

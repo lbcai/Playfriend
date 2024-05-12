@@ -737,6 +737,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         await ctx.message.delete()
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
+    @commands.command(name='test', help="Run daily loops (test).")
+    async def check_test(self, ctx):
+        await self.check_ts()
+        await self.check_daily()
+        await self.check_shard()
+        await ctx.message.delete()
+
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
         await self.send_shard_msg(None)
@@ -787,7 +794,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                                   re.IGNORECASE).groups(1))
                     if img_url:
                         message = message + "\n" + img_url[2:-3]
-                print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until daily message deletion: ",
+                print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until daily message deletion:",
                       time_until_end_of_day(), file=sys.stderr)
                 await self.sky_channel.send(message, delete_after=time_until_end_of_day())
             else:
@@ -829,7 +836,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             else:
                 deletion_time = time_until_end_of_day()
 
-            print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until shard message deletion: ",
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until shard message deletion:",
                   deletion_time, file=sys.stderr)
             await self.sky_channel.send(message, delete_after=deletion_time)
 
@@ -879,7 +886,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                     await asyncio.create_task(self.send_shard_msg(self.converted_times[i][1]))
 
     async def send_ts_msg(self, time_to_delete):
-        print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until ts message deletion: ",
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until ts message deletion:",
               time_to_delete, file=sys.stderr)
         await self.sky_channel.send(self.ts_message, delete_after=time_to_delete)
 
