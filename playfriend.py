@@ -3,7 +3,6 @@ import random
 import datetime
 import sys
 import asyncio
-import time
 
 import discord
 import emojis
@@ -13,7 +12,6 @@ import pymongo
 from discord import Intents
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot
-from discord.ext.commands.view import StringView
 from dotenv import load_dotenv
 
 from urllib.request import urlopen, Request
@@ -37,7 +35,10 @@ settings = {
         'grandma': True,
         'geyser': True,
         'sky': False,
-        'channel': None
+        'channel': None,
+        'last_spirit': None,
+        'last_spirit_end': "May 13, 2024",
+        'last_spirit_msg': ""
     }
 }
 guild = None
@@ -625,6 +626,7 @@ async def sky_start(ctx):
     settings["sky"]["sky"] = True
     settings["sky"]["channel"] = channel.id
     mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+    await ctx.message.delete()
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
 
@@ -644,8 +646,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.url_shard = 'https://sky-shards.pages.dev/en'
         self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events',
                            headers={'User-Agent': 'Mozilla/5.0'})
-        self.url_ts = Request('https://sky-children-of-the-light.fandom.com/wiki/Spirit_Visits',
-                              headers={'User-Agent': 'Mozilla/5.0'})
+        self.url_ts_string = 'https://sky-children-of-the-light.fandom.com/wiki/Spirit_Visits'
+        self.url_ts = Request(self.url_ts_string, headers={'User-Agent': 'Mozilla/5.0'})
         self.month_mapper = {
             1: 'January',
             2: 'February',
@@ -668,10 +670,16 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.shard_message = ""
         self.jobs = []
 
+        self.ts_message = settings['sky']['last_spirit_msg']
+        self.ts_end_date = settings['sky']['last_spirit_end']
+
         # start daily loops
         self.check_ts.start()
         self.check_daily.start()
         self.check_shard.start()
+
+        # save settings on startup too
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -682,6 +690,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             self.geyser_time_tracking.start()
             settings["sky"]["geyser"] = True
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        await ctx.message.delete()
 
     @commands.command(name='skygrandma', help='Enables/disables Grandma monitoring.')
     async def sky_grandma(self, ctx):
@@ -692,6 +701,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
             self.grandma_time_tracking.start()
             settings["sky"]["grandma"] = True
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        await ctx.message.delete()
 
     @commands.command(name='skych', help='Controls what channel Sky messages will be sent to.')
     async def sky_channel(self, ctx):
@@ -699,18 +709,24 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.sky_channel = ctx.channel
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
         await self.sky_channel.send(ready_message)
+        await ctx.message.delete()
 
     @commands.command(name='daily', help="Check today's seasonal candle locations.")
     async def check_daily_triggered(self, ctx):
         await self.check_daily()
+        await ctx.message.delete()
 
     @commands.command(name='shard', help="Check today's shards.")
     async def check_shard_triggered(self, ctx):
         await self.send_shard_msg(None)
+        await ctx.message.delete()
 
     @commands.command(name='ts', help="Check if there is news about the next traveling spirit.")
     async def check_ts_triggered(self, ctx):
-        await self.check_ts()
+        if len(self.ts_message) == 0:
+            await self.check_ts(triggered=True)
+        await self.send_ts_msg(time_until_end_of_day())
+        await ctx.message.delete()
 
     @commands.command(name='skyquit', help='Stop Sky tracking.')
     async def sky_quit(self, ctx):
@@ -718,12 +734,11 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
         message = f'Turning off Sky notifications.'
         await self.sky_channel.send(message)
+        await ctx.message.delete()
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
     async def cog_load(self):
-        # one time trigger for daily loops on startup
-        await self.check_ts()
-        await self.check_daily()
+        # one time trigger for necessary daily loops on startup
         await self.send_shard_msg(None)
 
     def cog_unload(self):
@@ -863,8 +878,14 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                 if datetime.datetime.now() <= self.converted_times[i][1]:
                     await asyncio.create_task(self.send_shard_msg(self.converted_times[i][1]))
 
+    async def send_ts_msg(self, time_to_delete):
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until ts message deletion: ",
+              time_to_delete, file=sys.stderr)
+        await self.sky_channel.send(self.ts_message, delete_after=time_to_delete)
+
     @tasks.loop(time=reset_time)
-    async def check_ts(self):
+    async def check_ts(self, triggered=False):
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "checking ts...", file=sys.stderr)
         response = urlopen(self.url_ts).read().decode('utf-8')
         index = response.index('<td><a href="/wiki/')
         if index != -1:
@@ -876,29 +897,33 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                 date = match.group(0)
                 converted_date = datetime.datetime.strptime(date, '%b %d, %Y')
                 end_date = converted_date + datetime.timedelta(days=4)
+                settings['sky']['last_spirit_end'] = end_date.strftime('%b %d, %Y')
                 time_to_delete = int((end_date - datetime.datetime.now()).total_seconds())
-                print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until ts message deletion: ",
-                      time_until_end_of_day(), "time from now to calculated end date: ", time_to_delete,
-                      file=sys.stderr)
 
                 if time_to_delete > 0:
-                    message = (
-                        f"The next traveling spirit is {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
+                    self.ts_message = (
+                        f"The next traveling spirit is {spirit} from {date} to {settings['sky']['last_spirit_end']}.\n"
                         f"{spirit_url}")
-                    await self.sky_channel.send(message, delete_after=time_until_end_of_day())
+                    if not triggered and self.ts_message != settings['sky']['last_spirit_msg']:
+                        await self.send_ts_msg(time_to_delete)
                 else:
-                    message = (
-                        f"The last traveling spirit was {spirit} from {date} to {end_date.strftime('%b %d, %Y')}.\n"
+                    self.ts_message = (
+                        f"The last traveling spirit was {spirit} from {date} to {settings['sky']['last_spirit_end']}.\n"
                         f"The next traveling spirit has not been announced yet.\n"
                         f"{spirit_url}")
-                    await self.sky_channel.send(message, delete_after=time_until_end_of_day())
             else:
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find date of next spirit", file=sys.stderr)
-                message = (f"The next traveling spirit is {spirit}.\n"
+                self.ts_message = (f"The next traveling spirit is {spirit}.\n"
                            f"{spirit_url}")
-                await self.sky_channel.send(message, delete_after=time_until_end_of_day())
+            settings['sky']['last_spirit'] = spirit
         else:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find last traveling spirit", file=sys.stderr)
+            self.ts_message = (f"Couldn't find the next traveling spirit. Check the link below.\n"
+                               f"{self.url_ts_string}")
+        if not triggered and self.ts_message != settings['sky']['last_spirit_msg']:
+            await self.send_ts_msg(time_until_end_of_day())
+        settings['sky']['last_spirit_msg'] = self.ts_message
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
 
 # @bot.event
