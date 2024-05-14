@@ -10,6 +10,11 @@ This bot was written by [lbcai](https://github.com/lbcai) as a Python & web host
 Click the invite link and invite the bot to your server. Use the >help command to see a list of currently available commands.
 
 ## Current Features
+*   :alarm_clock: Game Event Notifications: the bot sends notification messages when game events happen on both a daily loop cycle and on a shifting schedule according to event data obtained through web scraping with Selenium. Messages are deleted when they are no longer relevant.
+    <br>Currently supported games:<br>
+    *   Sky: Children of the Light
+<br>
+
 *   :hourglass: Hangman: play a hangman game hosted by the bot with a word from 728 possible GRE vocabulary words. Users can also submit their own custom word for other players to guess.
 <br>
 <p align="center" width="100%">
