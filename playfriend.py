@@ -913,6 +913,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                         f"{spirit_url}")
                     if not triggered and self.ts_message != settings['sky']['last_spirit_msg']:
                         await self.send_ts_msg(time_to_delete)
+                        settings['sky']['last_spirit_msg'] = self.ts_message
                 else:
                     self.ts_message = (
                         f"The last traveling spirit was {spirit} from {date} to {settings['sky']['last_spirit_end']}.\n"
@@ -929,7 +930,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
                                f"{self.url_ts_string}")
         if not triggered and self.ts_message != settings['sky']['last_spirit_msg']:
             await self.send_ts_msg(time_until_end_of_day())
-        settings['sky']['last_spirit_msg'] = self.ts_message
+            settings['sky']['last_spirit_msg'] = self.ts_message
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
 
