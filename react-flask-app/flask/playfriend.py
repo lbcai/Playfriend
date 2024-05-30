@@ -38,7 +38,8 @@ settings = {
         'channel': None,
         'last_spirit': None,
         'last_spirit_end': "May 13, 2024",
-        'last_spirit_msg': ""
+        'last_spirit_msg': "",
+        'deletion': {}
     }
 }
 guild = None
@@ -618,7 +619,16 @@ grandma_times = [
 reset_time = datetime.time(hour=7, minute=1)
 
 
-@bot.command(name='skytrack', help='Starts Sky: Children of Light event tracking.')
+@bot.event
+async def on_message_delete(message):
+    m_id = str(message.id)
+    if id in settings['sky']['deletion']:
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleted msg; updating db", file=sys.stderr)
+        del settings['sky']['deletion'][m_id]
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+
+
+@bot.command(name='skytrack', help='Starts Sky: Children of the Light event tracking.')
 async def sky_start(ctx):
     message = f'Starting Sky tracking.'
     channel = discord.utils.get(bot.get_all_channels(), name=ctx.channel.name)
@@ -630,7 +640,7 @@ async def sky_start(ctx):
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
 
-class SkyTracker(commands.Cog, name="Sky: Children of Light"):
+class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
     def __init__(self, self_bot, ctx):
         self.bot = self_bot
         if settings['sky']['geyser']:
@@ -680,6 +690,10 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
 
         # save settings on startup too
         mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+
+        # load up message deletions if they were interrupted
+        for message_id in settings['sky']['deletion']:
+            self.del_msg(message_id)
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -737,11 +751,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         await ctx.message.delete()
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
-    @commands.command(name='test', help="Run daily loops (test).")
+    @commands.command(name='test', help="(test)")
     async def check_test(self, ctx):
-        await self.check_ts()
-        await self.check_daily()
-        await self.check_shard()
+        await self.geyser_time_tracking()
         await ctx.message.delete()
 
     async def cog_load(self):
@@ -755,15 +767,37 @@ class SkyTracker(commands.Cog, name="Sky: Children of Light"):
         self.check_shard.cancel()
         self.clear_jobs()
 
+    def save_deletion(self, message, timedelta):
+        del_time = datetime.datetime.now() + datetime.timedelta(timedelta)
+        settings['sky']['deletion'][str(message.id)] = del_time
+        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+
+    async def del_msg(self, message_id):
+        if message_id in settings['sky']['deletion']:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", "waiting to delete msg:",
+                  message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
+            await discord.utils.sleep_until(settings['sky']['deletion'][message_id])
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleting msg:",
+                  message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
+            target = await self.sky_channel.fetch_message(int(message_id))
+            if not target:
+                # the message we must delete does not exist in the sky channel. remove reference
+                del settings['sky']['deletion'][message_id]
+                mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+            else:
+                target.delete()
+
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
         message = f'Geyser is in 10 minutes. Head to Sanctuary Islands in Daylight Prairie!'
-        await self.sky_channel.send(message, delete_after=600)
+        sent_msg = await self.sky_channel.send(message, delete_after=600)
+        self.save_deletion(sent_msg, 600)
 
     @tasks.loop(time=grandma_times)
     async def grandma_time_tracking(self):
         message = f'Grandma is in 10 minutes. Head to the Elevated Clearing in Hidden Forest!'
-        await self.sky_channel.send(message, delete_after=600)
+        sent_msg = await self.sky_channel.send(message, delete_after=600)
+        self.save_deletion(sent_msg, 600)
 
     @tasks.loop(time=reset_time)
     async def check_daily(self):
