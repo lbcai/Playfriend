@@ -1,3 +1,4 @@
+import copy
 import os
 import random
 import datetime
@@ -575,9 +576,9 @@ async def on_ready():
     ready_message = f'{bot.user.name} just woke up! Type ">help" for a basic command list.'
     channel = discord.utils.get(bot.get_all_channels(), name='playfriend')
     guild = channel.guild
-    old_settings = mongo_db.settings.find_one({"guild": guild.id})
+    old_settings = deserialize_read_settings()
     if old_settings:
-        settings = old_settings['settings']
+        settings = old_settings
     else:
         mongo_db.settings.insert_one({"guild": guild.id, "settings": settings})
     if settings['sky']['sky']:
@@ -625,7 +626,20 @@ async def on_message_delete(message):
     if id in settings['sky']['deletion']:
         print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleted msg; updating db", file=sys.stderr)
         del settings['sky']['deletion'][m_id]
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
+
+
+def serialize_save_settings():
+    mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+
+
+def deserialize_read_settings():
+    old_settings = mongo_db.settings.find_one({"guild": guild.id})['settings']
+    if old_settings:
+        for key in old_settings:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", key, old_settings[key], file=sys.stderr)
+        return old_settings
+    return None
 
 
 @bot.command(name='skytrack', help='Starts Sky: Children of the Light event tracking.')
@@ -635,7 +649,7 @@ async def sky_start(ctx):
     await channel.send(message)
     settings["sky"]["sky"] = True
     settings["sky"]["channel"] = channel.id
-    mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+    serialize_save_settings()
     await ctx.message.delete()
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
@@ -652,6 +666,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
             settings['channel'] = ctx.channel.id
         else:
             self.sky_channel = self.bot.get_channel(settings['sky']['channel'])
+
         # setting the URL you want to monitor
         self.url_shard = 'https://sky-shards.pages.dev/en'
         self.url = Request('https://sky-children-of-the-light.fandom.com/wiki/Seasonal_Events',
@@ -689,11 +704,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         self.check_shard.start()
 
         # save settings on startup too
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
-
-        # load up message deletions if they were interrupted
-        for message_id in settings['sky']['deletion']:
-            self.del_msg(message_id)
+        serialize_save_settings()
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -703,7 +714,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         else:
             self.geyser_time_tracking.start()
             settings["sky"]["geyser"] = True
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
         await ctx.message.delete()
 
     @commands.command(name='skygrandma', help='Enables/disables Grandma monitoring.')
@@ -714,14 +725,14 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         else:
             self.grandma_time_tracking.start()
             settings["sky"]["grandma"] = True
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
         await ctx.message.delete()
 
     @commands.command(name='skych', help='Controls what channel Sky messages will be sent to.')
     async def sky_channel(self, ctx):
         ready_message = f'Sky messages will only be sent to this channel.'
         self.sky_channel = ctx.channel
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
         await self.sky_channel.send(ready_message)
         await ctx.message.delete()
 
@@ -745,7 +756,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
     @commands.command(name='skyquit', help='Stop Sky tracking.')
     async def sky_quit(self, ctx):
         settings["sky"]["sky"] = False
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
         message = f'Turning off Sky notifications.'
         await self.sky_channel.send(message)
         await ctx.message.delete()
@@ -759,6 +770,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
         await self.send_shard_msg(None)
+        # load up message deletions if they were interrupted
+        for message_id in settings['sky']['deletion']:
+            await self.del_msg(message_id)
 
     def cog_unload(self):
         self.geyser_time_tracking.cancel()
@@ -767,23 +781,23 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         self.check_shard.cancel()
         self.clear_jobs()
 
-    def save_deletion(self, message, timedelta):
-        del_time = datetime.datetime.now() + datetime.timedelta(timedelta)
-        settings['sky']['deletion'][str(message.id)] = del_time
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+    def save_deletion(self, message, time):
+        del_time = datetime.datetime.now() + datetime.timedelta(seconds=time)
+        settings['sky']['deletion'][str(message.id)] = datetime.datetime.strftime(del_time, "%Y-%m-%d %H:%M:%S.%f")
+        serialize_save_settings()
 
     async def del_msg(self, message_id):
         if message_id in settings['sky']['deletion']:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "waiting to delete msg:",
                   message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
-            await discord.utils.sleep_until(settings['sky']['deletion'][message_id])
+            await discord.utils.sleep_until(datetime.datetime.strptime(settings['sky']['deletion'][message_id], "%Y-%m-%d %H:%M:%S.%f"))
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleting msg:",
                   message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
             target = await self.sky_channel.fetch_message(int(message_id))
             if not target:
                 # the message we must delete does not exist in the sky channel. remove reference
                 del settings['sky']['deletion'][message_id]
-                mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+                serialize_save_settings()
             else:
                 target.delete()
 
@@ -830,7 +844,9 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
                         message = message + "\n" + img_url[2:-3]
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until daily message deletion:",
                       time_until_end_of_day(), file=sys.stderr)
-                await self.sky_channel.send(message, delete_after=time_until_end_of_day())
+                time = time_until_end_of_day()
+                sent_msg = await self.sky_channel.send(message, delete_after=time)
+                self.save_deletion(sent_msg, time)
             else:
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", "failed to find candle rotation", file=sys.stderr)
         else:
@@ -872,7 +888,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
 
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until shard message deletion:",
                   deletion_time, file=sys.stderr)
-            await self.sky_channel.send(message, delete_after=deletion_time)
+            sent_msg = await self.sky_channel.send(message, delete_after=deletion_time)
+            self.save_deletion(sent_msg, deletion_time)
 
     def clear_jobs(self):
         for task in self.jobs:
@@ -922,7 +939,8 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
     async def send_ts_msg(self, time_to_delete):
         print(f"[{datetime.datetime.now()}] [INFO    ] ", "time until ts message deletion:",
               time_to_delete, file=sys.stderr)
-        await self.sky_channel.send(self.ts_message, delete_after=time_to_delete)
+        sent_msg = await self.sky_channel.send(self.ts_message, delete_after=time_to_delete)
+        self.save_deletion(sent_msg, time_to_delete)
 
     @tasks.loop(time=reset_time)
     async def check_ts(self, triggered=False):
@@ -965,7 +983,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         if not triggered and self.ts_message != settings['sky']['last_spirit_msg']:
             await self.send_ts_msg(time_until_end_of_day())
             settings['sky']['last_spirit_msg'] = self.ts_message
-        mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
+        serialize_save_settings()
 
 
 # @bot.event
