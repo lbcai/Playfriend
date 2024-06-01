@@ -578,12 +578,15 @@ async def on_ready():
     guild = channel.guild
     old_settings = deserialize_read_settings()
     if old_settings:
+        print(f"[{datetime.datetime.now()}] [INFO    ]  got old settings", file=sys.stderr)
         settings = old_settings
     else:
         mongo_db.settings.insert_one({"guild": guild.id, "settings": settings})
     if settings['sky']['sky']:
+        print(f"[{datetime.datetime.now()}] [INFO    ]  trying to set up cog", file=sys.stderr)
         channel = bot.get_channel(settings['sky']['channel'])
         await bot.add_cog(SkyTracker(bot, channel), guild=channel.guild)
+    print(f"[{datetime.datetime.now()}] [INFO    ]  sending rdy msg", file=sys.stderr)
     await channel.send(ready_message)
 
 
@@ -630,6 +633,7 @@ async def on_message_delete(message):
 
 
 def serialize_save_settings():
+    print(f"[{datetime.datetime.now()}] [INFO    ]  saving settings", file=sys.stderr)
     mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
 
@@ -650,7 +654,11 @@ async def sky_start(ctx):
     settings["sky"]["sky"] = True
     settings["sky"]["channel"] = channel.id
     serialize_save_settings()
-    await ctx.message.delete()
+    try:
+        await ctx.message.delete()
+    except discord.ext.commands.errors.CommandInvokeError:
+        # couldn't delete message, likely because of race condition deletion
+        pass
     await bot.add_cog(SkyTracker(bot, ctx), guild=ctx.guild)
 
 
@@ -693,7 +701,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         self.driver = webdriver.Chrome(options=options)
         self.converted_times = []
         self.shard_message = ""
-        self.jobs = []
 
         self.ts_message = settings['sky']['last_spirit_msg']
         self.ts_end_date = settings['sky']['last_spirit_end']
@@ -703,8 +710,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         self.check_daily.start()
         self.check_shard.start()
 
-        # save settings on startup too
-        serialize_save_settings()
+        print(f"[{datetime.datetime.now()}] [INFO    ]  finished init", file=sys.stderr)
 
     @commands.command(name='skygeyser', help='Enables/disables Geyser monitoring.')
     async def sky_geyser(self, ctx):
@@ -764,22 +770,22 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
 
     @commands.command(name='test', help="(test)")
     async def check_test(self, ctx):
-        await self.geyser_time_tracking()
+        message = f'test'
+        sent_msg = await self.sky_channel.send(message, delete_after=20)
+        self.save_deletion(sent_msg, 20)
+        serialize_save_settings()
         await ctx.message.delete()
 
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
         await self.send_shard_msg(None)
-        # load up message deletions if they were interrupted
-        for message_id in settings['sky']['deletion']:
-            await self.del_msg(message_id)
+        await self.reapply_message_deletion()
 
     def cog_unload(self):
         self.geyser_time_tracking.cancel()
         self.grandma_time_tracking.cancel()
         self.check_daily.cancel()
         self.check_shard.cancel()
-        self.clear_jobs()
 
     def save_deletion(self, message, time):
         del_time = datetime.datetime.now() + datetime.timedelta(seconds=time)
@@ -787,19 +793,29 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         serialize_save_settings()
 
     async def del_msg(self, message_id):
+        print('hello?')
         if message_id in settings['sky']['deletion']:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", "waiting to delete msg:",
                   message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
-            await discord.utils.sleep_until(datetime.datetime.strptime(settings['sky']['deletion'][message_id], "%Y-%m-%d %H:%M:%S.%f"))
-            print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleting msg:",
-                  message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
+            await discord.utils.sleep_until(datetime.datetime.strptime(settings['sky']['deletion'][message_id], '%Y-%m-%d %I:%M %p'))
+
             target = await self.sky_channel.fetch_message(int(message_id))
             if not target:
                 # the message we must delete does not exist in the sky channel. remove reference
+                print(f"[{datetime.datetime.now()}] [INFO    ] ", f"no message found with id {message_id}, removing from saved data", file=sys.stderr)
                 del settings['sky']['deletion'][message_id]
                 serialize_save_settings()
             else:
+                print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleting msg:",
+                      message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
                 target.delete()
+
+    @tasks.loop(time=reset_time)
+    async def reapply_message_deletion(self):
+        # load up message deletions if they were interrupted
+        for message_id in settings['sky']['deletion']:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", message_id, "calling del_msg", file=sys.stderr)
+            await asyncio.create_task(self.del_msg(message_id))
 
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
@@ -891,17 +907,11 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
             sent_msg = await self.sky_channel.send(message, delete_after=deletion_time)
             self.save_deletion(sent_msg, deletion_time)
 
-    def clear_jobs(self):
-        for task in self.jobs:
-            task.cancel()
-        self.jobs = []
-
     @tasks.loop(time=reset_time)
     async def check_shard(self):
         print(f"[{datetime.datetime.now()}] [INFO    ] ", "checking shard...", file=sys.stderr)
         self.converted_times = []
         self.shard_message = ""
-        self.clear_jobs()
 
         self.driver.get(self.url_shard)
         bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
