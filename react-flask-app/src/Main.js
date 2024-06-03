@@ -40,11 +40,11 @@ function Main() {
     };
 
     const handleClick_invite = () => {
-        window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
+        window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498");
       };
 
     const handleClick_demo = () => {
-        window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot");
+        window.open("https://discord.com/oauth2/authorize?client_id=785345529722175498");
     };
 
 
