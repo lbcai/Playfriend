@@ -36,5 +36,5 @@ Click the invite link and invite the bot to your server. Use the >help command t
 
 
 ## Links
-*   [Invite Link](https://discord.com/api/oauth2/authorize?client_id=785345529722175498&permissions=470080&scope=bot)
+*   [Invite Link](https://discord.com/oauth2/authorize?client_id=785345529722175498)
 *   [Website](https://playfriend.onrender.com/)
