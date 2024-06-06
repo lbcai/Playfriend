@@ -627,15 +627,17 @@ reset_time = datetime.time(hour=7, minute=1)
 async def on_raw_message_delete(payload):
     # async for entry in payload.guild.audit_logs(limit=1, action=discord.AuditLogAction.message_delete):
     #     print(entry)
-    print('msg deleted')
+    global settings
     m_id = str(payload.message_id)
     if m_id in settings['sky']['deletion']:
-        print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleted msg; updating db", file=sys.stderr)
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", f"deleted msg {m_id}", file=sys.stderr)
         del settings['sky']['deletion'][m_id]
-        serialize_save_settings()
+    print(f"[{datetime.datetime.now()}] [INFO    ] ", "updating db", file=sys.stderr)
+    serialize_save_settings()
 
 
 def serialize_save_settings():
+    global settings
     print(f"[{datetime.datetime.now()}] [INFO    ]  saving settings", file=sys.stderr)
     mongo_db.settings.find_one_and_update({"guild": guild.id}, {'$set': {"settings": settings}})
 
@@ -799,7 +801,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
 
     async def del_msg(self, message_id):
         if message_id in settings['sky']['deletion']:
-            print(settings['sky']['deletion'][message_id])
             if datetime.datetime.now() >= datetime.datetime.strptime(settings['sky']['deletion'][message_id], '%Y-%m-%d %I:%M %p'):
                 try:
                     target = await self.sky_channel.fetch_message(int(message_id))
@@ -809,6 +810,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
                 except discord.errors.NotFound:
                     # the message we must delete does not exist in the sky channel. remove reference
                     print(f"[{datetime.datetime.now()}] [INFO    ] ", f"message {message_id} not found", file=sys.stderr)
+
                 print(f"[{datetime.datetime.now()}] [INFO    ] ", f"removing message {message_id} from saved data",
                       file=sys.stderr)
                 del settings['sky']['deletion'][message_id]
@@ -816,10 +818,10 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
     @tasks.loop(time=reset_time)
     async def reapply_message_deletion(self):
         # load up message deletions if they were interrupted
-        for index, message_id in enumerate(settings['sky']['deletion']):
+        dict_copy = copy.deepcopy(settings['sky']['deletion'])
+        for message_id in dict_copy:
             print(f"[{datetime.datetime.now()}] [INFO    ] ", message_id, "calling del_msg", file=sys.stderr)
             await self.del_msg(message_id)
-        serialize_save_settings()
 
     @tasks.loop(time=geyser_times)
     async def geyser_time_tracking(self):
