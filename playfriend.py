@@ -632,8 +632,8 @@ async def on_raw_message_delete(payload):
     if m_id in settings['sky']['deletion']:
         print(f"[{datetime.datetime.now()}] [INFO    ] ", f"deleted msg {m_id}", file=sys.stderr)
         del settings['sky']['deletion'][m_id]
-    print(f"[{datetime.datetime.now()}] [INFO    ] ", "updating db", file=sys.stderr)
-    serialize_save_settings()
+        print(f"[{datetime.datetime.now()}] [INFO    ] ", "updating db", file=sys.stderr)
+        serialize_save_settings()
 
 
 def serialize_save_settings():
@@ -773,13 +773,13 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         await ctx.message.delete()
         await bot.remove_cog("SkyTracker", guild=ctx.guild)
 
-    @commands.command(name='test', help="(test)")
-    async def check_test(self, ctx):
-        message = f'test'
-        sent_msg = await self.sky_channel.send(message, delete_after=20)
-        self.save_deletion(sent_msg, 20)
-        serialize_save_settings()
-        await ctx.message.delete()
+    # @commands.command(name='test', help="(test)")
+    # async def check_test(self, ctx):
+    #     message = f'test'
+    #     sent_msg = await self.sky_channel.send(message, delete_after=20)
+    #     self.save_deletion(sent_msg, 20)
+    #     serialize_save_settings()
+    #     await ctx.message.delete()
 
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
@@ -806,14 +806,15 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
                     target = await self.sky_channel.fetch_message(int(message_id))
                     print(f"[{datetime.datetime.now()}] [INFO    ] ", "deleting msg:",
                           message_id, 'at', settings['sky']['deletion'][message_id], file=sys.stderr)
+                    # if msg deleted, listener for msg deletion event handles settings.
                     await target.delete()
                 except discord.errors.NotFound:
                     # the message we must delete does not exist in the sky channel. remove reference
                     print(f"[{datetime.datetime.now()}] [INFO    ] ", f"message {message_id} not found", file=sys.stderr)
 
-                print(f"[{datetime.datetime.now()}] [INFO    ] ", f"removing message {message_id} from saved data",
-                      file=sys.stderr)
-                del settings['sky']['deletion'][message_id]
+                    print(f"[{datetime.datetime.now()}] [INFO    ] ", f"removing message {message_id} from saved data",
+                          file=sys.stderr)
+                    del settings['sky']['deletion'][message_id]
 
     @tasks.loop(time=reset_time)
     async def reapply_message_deletion(self):
@@ -887,6 +888,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
             await self.check_shard()
         else:
             message = self.shard_message
+            now_dt = datetime.datetime.now()
             if len(self.converted_times) > 0:
                 deletion_time = None
                 if now_dt < self.converted_times[1][1]:
@@ -915,7 +917,6 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
                   deletion_time, file=sys.stderr)
             sent_msg = await self.sky_channel.send(message, delete_after=deletion_time)
             self.save_deletion(sent_msg, deletion_time)
-        print('outside')
 
     @tasks.loop(time=reset_time)
     async def check_shard(self):
