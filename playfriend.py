@@ -783,9 +783,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
 
     async def cog_load(self):
         # one time trigger for necessary daily loops on startup
-        print('before')
         # await self.send_shard_msg(None)
-        print('after')
         await self.reapply_message_deletion()
 
     def cog_unload(self):
@@ -881,9 +879,7 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
               file=sys.stderr)
         if time_to_wait is not None:
             seconds = int((time_to_wait - now_dt).total_seconds())
-            print(seconds)
             await asyncio.sleep(seconds)
-            print(seconds, 'test')
         if self.shard_message == "":
             await self.check_shard()
         else:
@@ -928,8 +924,10 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
         bold_class = self.driver.find_elements(By.CLASS_NAME, 'font-bold')
 
         times = self.driver.find_elements(By.XPATH, "//*[contains(text(), ':')]")
-        pattern = re.compile("..:.. (A|P)M")
+        pattern = re.compile("..:..:.. (A|P)M")
         filtered_times = [element for element in times if pattern.search(element.text)]
+        for item in filtered_times:
+            print(f"[{datetime.datetime.now()}] [INFO    ] ", item.text, file=sys.stderr)
         if bold_class[0].text.startswith("N"):
             self.shard_message = (f"Today there are no shard eruptions.\n" + self.url_shard)
             await self.send_shard_msg(None)
@@ -938,12 +936,12 @@ class SkyTracker(commands.Cog, name="Sky: Children of the Light"):
                 item = "ascended candles"
             else:
                 item = "cakes of wax"
-            reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Giving')]").text
+            reward = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Reward')]").text
             num_list = re.findall(r'\d+\.?\d?', reward)
             converted_times = []
             now = str(datetime.datetime.now()).split(" ")[0]
-            for i in range(2, 8):
-                start = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M %p')
+            for i in range(0, 6):
+                start = datetime.datetime.strptime(now + " " + filtered_times[i].text, '%Y-%m-%d %I:%M:%S %p')
                 seconds = round(start.timestamp())
                 converted_times.append((seconds, start))
 
